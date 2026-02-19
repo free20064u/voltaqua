@@ -1,2 +1,5 @@
 # voltaqua
-An app for the distribution of water and electricity bills
+An app for the distribution of water and electricity bills. The app has two phases. one phase for water bill distribution and the other phase for electricity bill distribution.
+
+WATER BILL DISTRIBUTION:
+This section of the app is designed to be used to distribute water among tenant of a compount house or apartment within a block of apartments. The app has a administrator who enters the monthly water bill given to the compound house of apartments by the GWCL. He also registers the apartments onto the dashboard. He is also responsible for entering the number of people in each apartment on monthly basis just like the monlthly bill. The app should also allow the appartment heads to have an interface that will enalb them to view the bill for the entire block and also thier individual apartments only. the admin should also be able to enter payments recieved from each of the appartments and this shold also be seen by the individual apartment. 

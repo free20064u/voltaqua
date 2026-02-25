@@ -2,6 +2,24 @@
 
 Django project for water distribution to households within a block of houses.
 
+## Static files and image handling
+
+This project uses [Whitenoise](http://whitenoise.evans.io/en/stable/) to serve static assets (CSS, JS and images) directly from Django without needing a separate web server. Configuration has been added to `core/settings.py`:
+
+* `WhiteNoiseMiddleware` is enabled in the middleware stack.
+* `STATIC_ROOT` is set to `BASE_DIR / 'staticfiles'` and `STATICFILES_STORAGE` uses `CompressedManifestStaticFilesStorage` for compression and caching.
+
+After changing or adding static assets run:
+
+```bash
+python manage.py collectstatic
+```
+
+The `pillow` library is installed to allow image processing (thumbnails, generation, etc.). You can use it in views or management commands to create/resize PNGs or JPGs; Django will then serve them through the usual static file mechanisms (or via media if you set up `MEDIA_ROOT`).
+
+Place your images under `base/static/img/` (or the appropriate app’s `static/` folder) and refer to them with the `{% static %}` template tag.
+
+
 Quick start
 
 1. Create a virtualenv and install dependencies:

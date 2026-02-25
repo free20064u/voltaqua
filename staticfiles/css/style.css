@@ -1,0 +1,56 @@
+/* Custom styles to enhance Bootstrap */
+
+body {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.card {
+    border-radius: 15px;
+    background: white;
+}
+
+.card-body {
+    background: white;
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border: none;
+}
+
+.btn-primary:hover {
+    background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+}
+
+.btn-outline-primary {
+    color: #667eea;
+    border-color: #667eea;
+}
+
+.btn-outline-primary:hover {
+    background: #667eea;
+    border-color: #667eea;
+    transform: translateY(-2px);
+}
+
+.border-left {
+    border-left: 4px solid !important;
+}
+
+.border-primary {
+    border-color: #667eea !important;
+}
+
+.text-primary {
+    color: #667eea !important;
+}
+
+.card h5 {
+    font-weight: 600;
+}
+
+.min-vh-100 {
+    min-height: 100vh;
+}

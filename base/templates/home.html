@@ -2,60 +2,92 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ title }}</title>
-    <!-- Bootstrap CSS (Local) -->
-    <link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet">
-    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>{{ title }}</title>
+        <link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet">
+        <link rel="stylesheet" href="{% static 'css/style.css' %}">
+        <style>
+            .hero {
+                background: linear-gradient(135deg, #E6F7FF 0%, #FFFFFF 100%);
+            }
+            .feature-icon {
+                font-size: 1.6rem;
+            }
+        </style>
 </head>
 <body>
-    <div class="container-fluid min-vh-100 d-flex align-items-center justify-content-center">
-        <div class="row w-100">
-            <div class="col-md-8 col-lg-6 mx-auto">
-                <div class="card shadow-lg border-0">
-                    <div class="card-body text-center p-5">
-                        <h1 class="card-title display-4 mb-3">💧 {{ title }}</h1>
-                        <p class="card-text lead mb-4">Efficiently manage water distribution across residential blocks with ease and transparency.</p>
-                        
-                        <div class="d-flex gap-3 justify-content-center mb-5 flex-wrap">
-                            <a href="{% url 'admin:index' %}" class="btn btn-primary btn-lg">Admin Dashboard</a>
-                            <a href="#about" class="btn btn-outline-primary btn-lg">Learn More</a>
+        {% include 'navbar.html' %}
+
+        <header class="hero py-5">
+            <div class="container py-5">
+                <div class="row align-items-center">
+                    <div class="col-lg-6 text-center text-lg-start">
+                        <h1 class="display-4 fw-bold mb-3">Manage Utilities with Confidence</h1>
+                        <p class="lead text-muted mb-4">Voltaqua makes distribution, monitoring, and billing for water and electric simple, transparent, and fair.</p>
+                        <div class="d-flex gap-2 flex-wrap justify-content-center justify-content-lg-start">
+                            <a href="{% url 'water:water' %}" class="btn btn-primary btn-lg">Water Services</a>
+                            <a href="{% url 'electric:electric' %}" class="btn btn-outline-primary btn-lg">Electric Services</a>
+                            <a href="{% url 'base:about' %}" class="btn btn-link text-decoration-none align-self-center">Learn more</a>
                         </div>
-                        
-                        <div class="row mt-5">
-                            <div class="col-md-4 mb-3">
-                                <div class="card border-left border-primary h-100">
-                                    <div class="card-body">
-                                        <h5 class="card-title text-primary">📊 Track Usage</h5>
-                                        <p class="card-text">Monitor water consumption per household in real-time.</p>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-4 mb-3">
-                                <div class="card border-left border-primary h-100">
-                                    <div class="card-body">
-                                        <h5 class="card-title text-primary">💰 Billing</h5>
-                                        <p class="card-text">Automated and transparent billing for all residents.</p>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-4 mb-3">
-                                <div class="card border-left border-primary h-100">
-                                    <div class="card-body">
-                                        <h5 class="card-title text-primary">📢 Notifications</h5>
-                                        <p class="card-text">Alert residents about maintenance and schedule changes.</p>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+                    </div>
+                    <div class="col-lg-6 mt-4 mt-lg-0 text-center">
+                        <img src="{% static 'img/hero-illustration.png' %}" alt="hero" class="img-fluid" style="max-width:420px; filter: drop-shadow(0 8px 24px rgba(0,0,0,0.08));">
                     </div>
                 </div>
             </div>
-        </div>
-    </div>
-    
-    <!-- Bootstrap JS (Local) -->
-    <script src="{% static 'js/bootstrap.bundle.min.js' %}"></script>
+        </header>
+
+        <main class="container my-5">
+            <section class="text-center mb-5">
+                <h2 class="h3 fw-semibold">What we offer</h2>
+                <p class="text-muted">Everything you need to manage utility distribution, consumption tracking, and billing in one place.</p>
+            </section>
+
+            <section class="row g-4">
+                <div class="col-md-4">
+                    <div class="card h-100 shadow-sm border-0">
+                        <div class="card-body text-center">
+                            <div class="mb-3 feature-icon">📊</div>
+                            <h5 class="card-title">Real-time Monitoring</h5>
+                            <p class="card-text text-muted">Track usage by household and spot anomalies quickly.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card h-100 shadow-sm border-0">
+                        <div class="card-body text-center">
+                            <div class="mb-3 feature-icon">💳</div>
+                            <h5 class="card-title">Automated Billing</h5>
+                            <p class="card-text text-muted">Generate transparent bills and streamline collections.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card h-100 shadow-sm border-0">
+                        <div class="card-body text-center">
+                            <div class="mb-3 feature-icon">🔔</div>
+                            <h5 class="card-title">Alerts & Maintenance</h5>
+                            <p class="card-text text-muted">Notify residents about outages and scheduled maintenance.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <footer class="bg-dark text-light py-4 mt-auto">
+            <div class="container">
+                <div class="row align-items-center">
+                    <div class="col-md-6 text-center text-md-start mb-3 mb-md-0">
+                        <strong>Voltaqua</strong> — Utility Bill Distribution Management
+                    </div>
+                    <div class="col-md-6 text-center text-md-end">
+                        <small class="text-muted">© {{ now|default:"" }} Voltaqua. All rights reserved.</small>
+                    </div>
+                </div>
+            </div>
+        </footer>
+
+        <script src="{% static 'js/bootstrap.bundle.min.js' %}"></script>
 </body>
 </html>

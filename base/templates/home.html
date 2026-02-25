@@ -1,0 +1,61 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ title }}</title>
+    <!-- Bootstrap CSS (Local) -->
+    <link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+<body>
+    <div class="container-fluid min-vh-100 d-flex align-items-center justify-content-center">
+        <div class="row w-100">
+            <div class="col-md-8 col-lg-6 mx-auto">
+                <div class="card shadow-lg border-0">
+                    <div class="card-body text-center p-5">
+                        <h1 class="card-title display-4 mb-3">💧 {{ title }}</h1>
+                        <p class="card-text lead mb-4">Efficiently manage water distribution across residential blocks with ease and transparency.</p>
+                        
+                        <div class="d-flex gap-3 justify-content-center mb-5 flex-wrap">
+                            <a href="{% url 'admin:index' %}" class="btn btn-primary btn-lg">Admin Dashboard</a>
+                            <a href="#about" class="btn btn-outline-primary btn-lg">Learn More</a>
+                        </div>
+                        
+                        <div class="row mt-5">
+                            <div class="col-md-4 mb-3">
+                                <div class="card border-left border-primary h-100">
+                                    <div class="card-body">
+                                        <h5 class="card-title text-primary">📊 Track Usage</h5>
+                                        <p class="card-text">Monitor water consumption per household in real-time.</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <div class="card border-left border-primary h-100">
+                                    <div class="card-body">
+                                        <h5 class="card-title text-primary">💰 Billing</h5>
+                                        <p class="card-text">Automated and transparent billing for all residents.</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <div class="card border-left border-primary h-100">
+                                    <div class="card-body">
+                                        <h5 class="card-title text-primary">📢 Notifications</h5>
+                                        <p class="card-text">Alert residents about maintenance and schedule changes.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Bootstrap JS (Local) -->
+    <script src="{% static 'js/bootstrap.bundle.min.js' %}"></script>
+</body>
+</html>

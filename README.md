@@ -1,4 +1,29 @@
 # voltaqua
+
+Django project for water distribution to households within a block of houses.
+
+Quick start
+
+1. Create a virtualenv and install dependencies:
+
+```bash
+python -m venv .venv
+source .venv/Scripts/activate   # Windows: .venv\\Scripts\\activate
+pip install -r requirements.txt
+```
+
+2. Run migrations and start server:
+
+```bash
+python manage.py migrate
+python manage.py createsuperuser
+python manage.py runserver
+```
+
+3. API endpoints are under `/api/` (Blocks, Households, Meters, ConsumptionRecords).
+
+If you want, I can run migrations and add example fixtures next.
+# voltaqua
 An app for the distribution of water and electricity bills. The app has two phases. one phase for water bill distribution and the other phase for electricity bill distribution.
 
 WATER BILL DISTRIBUTION:

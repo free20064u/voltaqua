@@ -25,6 +25,7 @@ urlpatterns = [
     path('water/', include('water.urls')),
     path('electric/', include('electric.urls')),
     path('admin/', admin.site.urls),
+    path('accounts/', include('accounts.urls')),
 ]
 
 # during development serve media files

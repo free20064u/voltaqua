@@ -19,6 +19,16 @@ The `pillow` library is installed to allow image processing (thumbnails, generat
 
 Place your images under `base/static/img/` (or the appropriate app’s `static/` folder) and refer to them with the `{% static %}` template tag.
 
+### Profile Images
+A `profile_image` field was added to the custom `User` model. After pulling these changes run:
+
+```bash
+python manage.py makemigrations accounts
+python manage.py migrate
+```
+
+This will create the media directory structure and allow users to upload avatars. Use the `/accounts/profile/` page to edit your profile picture.
+
 
 Quick start
 

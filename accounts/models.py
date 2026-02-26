@@ -34,6 +34,8 @@ class User(AbstractBaseUser, PermissionsMixin):
 	is_active = models.BooleanField(default=True)
 	is_staff = models.BooleanField(default=False)
 	date_joined = models.DateTimeField(default=timezone.now)
+	# optional profile picture
+	profile_image = models.ImageField(upload_to='profiles/', blank=True, null=True)
 
 	objects = UserManager()
 

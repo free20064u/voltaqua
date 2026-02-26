@@ -134,6 +134,10 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # Use custom user model
 AUTH_USER_MODEL = 'accounts.User'
 
+# Redirect after login
+LOGIN_REDIRECT_URL = 'base:home'
+LOGOUT_REDIRECT_URL = 'base:home'
+
 # Media files (uploaded by users)
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'

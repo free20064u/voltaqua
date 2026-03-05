@@ -1,0 +1,205 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{{ title }}</title>
+  <link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet">
+  <link rel="stylesheet" href="{% static 'css/style.css' %}">
+  <style>
+    .stat-card { min-height:120px }
+    .table-actions a { margin-right: .4rem }
+    .apartment-card { border-left: 4px solid #0d6efd; }
+  </style>
+</head>
+<body>
+  {% include 'navbar.html' %}
+
+  <main class="container my-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <h1 class="h3 mb-0">{{ entity_name }} Dashboard (Block Admin)</h1>
+      <div>
+        <a class="btn btn-outline-secondary" href="{% url 'water:home' %}">Refresh</a>
+        <a class="btn btn-primary" href="{% url 'water:block-dashboard' site.id %}">View Full Block</a>
+      </div>
+    </div>
+
+    <!-- Block-level Statistics -->
+    <div class="row g-3 mb-4">
+      <div class="col-md-3">
+        <div class="card stat-card shadow-sm">
+          <div class="card-body text-center">
+            <h6 class="text-muted">Daily Consumption</h6>
+            <h3 class="fw-bold">{{ stats.total_consumption_m3 }}</h3>
+            <small class="text-muted">m³</small>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="card stat-card shadow-sm">
+          <div class="card-body text-center">
+            <h6 class="text-muted">Active Meters</h6>
+            <h3 class="fw-bold">{{ stats.active_meters }}</h3>
+            <small class="text-muted">in block</small>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="card stat-card shadow-sm">
+          <div class="card-body text-center">
+            <h6 class="text-muted">Outstanding Bills</h6>
+            <h3 class="fw-bold">{{ stats.outstanding_bills }}</h3>
+            <small class="text-muted">unpaid</small>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="card stat-card shadow-sm">
+          <div class="card-body text-center">
+            <h6 class="text-muted">Collection Rate</h6>
+            <h3 class="fw-bold">{{ stats.collection_rate }}%</h3>
+            <div class="progress mt-2">
+              <div class="progress-bar bg-success" role="progressbar" style="width: {{ stats.collection_rate }}%" aria-valuenow="{{ stats.collection_rate }}" aria-valuemin="0" aria-valuemax="100"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Block Info Card -->
+    {% if site %}
+    <div class="card shadow-sm mb-4">
+      <div class="card-body">
+        <h5 class="card-title">Block Information</h5>
+        <div class="row">
+          <div class="col-md-6">
+            <p><strong>Block Name:</strong> {{ site.name }}</p>
+            <p><strong>Block Code:</strong> {{ site.code }}</p>
+            <p><strong>Address:</strong> {{ site.address|default:"N/A" }}</p>
+          </div>
+          <div class="col-md-6">
+            <p><strong>Timezone:</strong> {{ site.timezone }}</p>
+            <p><strong>Total Apartments:</strong> {{ total_apartments }}</p>
+            <p><strong>Created:</strong> {{ site.created_at|date:"M d, Y" }}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+    {% else %}
+    <div class="alert alert-warning" role="alert">
+      {{ message }}
+    </div>
+    {% endif %}
+
+    <div class="row">
+      <!-- Apartments in Block -->
+      <div class="col-lg-8">
+        <div class="card shadow-sm mb-4">
+          <div class="card-body">
+            <h5 class="card-title">Apartments in Block</h5>
+            <div class="mb-3">
+              {% if request.user.role == 'block_admin' %}
+              <a href="{% url 'water:enter-bill' site.id %}" class="btn btn-success btn-sm">
+                + Add Monthly Bill
+              </a>
+              {% endif %}
+            </div>
+            {% if apartments %}
+            <div class="row g-3">
+              {% for item in apartments %}
+              <div class="col-md-6">
+                <div class="card apartment-card h-100">
+                  <div class="card-body">
+                    <h6 class="card-title">Apt {{ item.apartment.number }}</h6>
+                    <p class="text-muted small mb-2">
+                      👥 Occupants: <strong>{{ item.apartment.occupants }}</strong>
+                    </p>
+                    <dl class="row mb-3">
+                      <dt class="col-sm-6 text-muted small">Consumption:</dt>
+                      <dd class="col-sm-6 text-end small"><strong>{{ item.stats.total_consumption_m3 }} m³</strong></dd>
+                      <dt class="col-sm-6 text-muted small">Unpaid Bills:</dt>
+                      <dd class="col-sm-6 text-end small"><strong>{{ item.stats.outstanding_bills }}</strong></dd>
+                    </dl>
+                    <div class="d-flex gap-2">
+                      <a href="{% url 'water:apartment-dashboard' item.apartment.id %}" class="btn btn-sm btn-outline-primary flex-grow-1">View</a>
+                      {% if request.user.role == 'block_admin' %}
+                      <a href="{% url 'water:edit-apartment' item.apartment.id %}" class="btn btn-sm btn-outline-info">Edit Occupants</a>
+                      {% endif %}
+                    </div>
+                  </div>
+                </div>
+              </div>
+              {% endfor %}
+            </div>
+            {% else %}
+            <p class="text-muted">No apartments in this block yet.</p>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+
+      <!-- Recent Readings & Bills -->
+      <div class="col-lg-4">
+        <div class="card shadow-sm mb-4">
+          <div class="card-body">
+            <h5 class="card-title">Recent Readings</h5>
+            <div class="table-responsive">
+              <table class="table table-sm">
+                <thead>
+                  <tr>
+                    <th>Apt</th>
+                    <th>Meter</th>
+                    <th>m³</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for r in latest_readings %}
+                  <tr>
+                    <td>{{ r.apartment }}</td>
+                    <td><small>{{ r.meter_id }}</small></td>
+                    <td>{{ r.consumption }}</td>
+                  </tr>
+                  {% empty %}
+                  <tr>
+                    <td colspan="3" class="text-muted text-center">No readings yet</td>
+                  </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <div class="card shadow-sm">
+          <div class="card-body">
+            <h5 class="card-title">Recent Bills</h5>
+            <ul class="list-group list-group-flush">
+              {% for bill in recent_bills %}
+              <li class="list-group-item d-flex justify-content-between align-items-start">
+                <div>
+                  {% if bill.apartment %}
+                    <strong>Apt {{ bill.apartment.number }}</strong>
+                  {% else %}
+                    <strong>Block Bill</strong>
+                  {% endif %}
+                  <br><small class="text-muted">{{ currency_symbol }}{{ bill.amount_due }}</small>
+                </div>
+                <span class="badge {% if bill.status == 'paid' %}bg-success{% elif bill.status == 'pending' %}bg-warning text-dark{% else %}bg-danger{% endif %}">{{ bill.get_status_display }}</span>
+              </li>
+              {% empty %}
+              <li class="list-group-item text-muted text-center">No bills yet</li>
+              {% endfor %}
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  {% include 'footer.html' %}
+
+  <script src="{% static 'js/bootstrap.bundle.min.js' %}"></script>
+</body>
+</html>

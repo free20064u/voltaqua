@@ -1,0 +1,166 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{{ title }}</title>
+  <link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet">
+  <link rel="stylesheet" href="{% static 'css/style.css' %}">
+  <style>
+    .stat-card { min-height:120px }
+    .table-actions a { margin-right: .4rem }
+  </style>
+</head>
+<body>
+  {% include 'navbar.html' %}
+
+  <main class="container my-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <h1 class="h3 mb-0">{{ entity_name }} — Water Dashboard</h1>
+      <div>
+        <a class="btn btn-outline-secondary" href="{% url 'water:apartment-dashboard' apartment.id %}">Refresh</a>
+        <a class="btn btn-primary" href="{% url 'water:home' %}">Back to Dashboard</a>
+      </div>
+    </div>
+
+    <!-- Apartment Statistics -->
+    <div class="row g-3 mb-4">
+      <div class="col-md-3">
+        <div class="card stat-card shadow-sm">
+          <div class="card-body text-center">
+            <h6 class="text-muted">Daily Consumption</h6>
+            <h3 class="fw-bold">{{ stats.total_consumption_m3 }}</h3>
+            <small class="text-muted">m³</small>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="card stat-card shadow-sm">
+          <div class="card-body text-center">
+            <h6 class="text-muted">Active Meters</h6>
+            <h3 class="fw-bold">{{ stats.active_meters }}</h3>
+            <small class="text-muted">in apartment</small>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="card stat-card shadow-sm">
+          <div class="card-body text-center">
+            <h6 class="text-muted">Outstanding Bills</h6>
+            <h3 class="fw-bold">{{ stats.outstanding_bills }}</h3>
+            <small class="text-muted">unpaid</small>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="card stat-card shadow-sm">
+          <div class="card-body text-center">
+            <h6 class="text-muted">Collection Rate</h6>
+            <h3 class="fw-bold">{{ stats.collection_rate }}%</h3>
+            <div class="progress mt-2">
+              <div class="progress-bar bg-success" role="progressbar" style="width: {{ stats.collection_rate }}%" aria-valuenow="{{ stats.collection_rate }}" aria-valuemin="0" aria-valuemax="100"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Apartment Information -->
+    {% if apartment %}
+    <div class="card shadow-sm mb-4">
+      <div class="card-body">
+        <h5 class="card-title">Apartment Information</h5>
+        <div class="row">
+          <div class="col-md-6">
+            <p><strong>Unit Number:</strong> {{ apartment.number }}</p>
+            <p><strong>Block:</strong> {{ apartment.site.name }} ({{ apartment.site.code }})</p>
+          </div>
+          <div class="col-md-6">
+            <p><strong>Occupants:</strong> {{ apartment.occupants }}</p>
+            <p><strong>Created:</strong> {{ apartment.created_at|date:"M d, Y" }}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+    {% endif %}
+
+    <div class="row">
+      <!-- Latest Readings -->
+      <div class="col-lg-8">
+        <div class="card shadow-sm mb-4">
+          <div class="card-body">
+            <h5 class="card-title">Latest Meter Readings</h5>
+            <div class="table-responsive">
+              <table class="table table-hover">
+                <thead>
+                  <tr>
+                    <th>Meter ID</th>
+                    <th>Consumption (m³)</th>
+                    <th>Bill (Est.)</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for r in latest_readings %}
+                  <tr>
+                    <td>{{ r.meter_id }}</td>
+                    <td>{{ r.consumption }}</td>
+                    <td>{{ currency_symbol }}{{ r.bill }}</td>
+                    <td>
+                      {% if r.status == 'Paid' %}
+                        <span class="badge bg-success">Paid</span>
+                      {% elif r.status == 'Unpaid' %}
+                        <span class="badge bg-danger">Unpaid</span>
+                      {% else %}
+                        <span class="badge bg-warning text-dark">{{ r.status }}</span>
+                      {% endif %}
+                    </td>
+                  </tr>
+                  {% empty %}
+                  <tr>
+                    <td colspan="4" class="text-muted text-center">No readings available</td>
+                  </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Summary Card -->
+      <div class="col-lg-4">
+        <div class="card shadow-sm">
+          <div class="card-body">
+            <h5 class="card-title">Summary</h5>
+            <ul class="list-group list-group-flush">
+              <li class="list-group-item d-flex justify-content-between">
+                <span>Total Consumption</span>
+                <strong>{{ stats.total_consumption_m3 }} m³</strong>
+              </li>
+              <li class="list-group-item d-flex justify-content-between">
+                <span>Active Meters</span>
+                <strong>{{ stats.active_meters }}</strong>
+              </li>
+              <li class="list-group-item d-flex justify-content-between">
+                <span>Unpaid Bills</span>
+                <strong>{{ stats.outstanding_bills }}</strong>
+              </li>
+              <li class="list-group-item d-flex justify-content-between">
+                <span>Collection Rate</span>
+                <strong>{{ stats.collection_rate }}%</strong>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  {% include 'footer.html' %}
+
+  <script src="{% static 'js/bootstrap.bundle.min.js' %}"></script>
+</body>
+</html>

@@ -1,0 +1,186 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{{ title }}</title>
+  <link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet">
+  <link rel="stylesheet" href="{% static 'css/style.css' %}">
+  <style>
+    .stat-card { min-height:120px }
+    .table-actions a { margin-right: .4rem }
+  </style>
+</head>
+<body>
+  {% include 'navbar.html' %}
+
+  <main class="container my-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <h1 class="h3 mb-0">{{ entity_name }} Dashboard (Superuser)</h1>
+      <div>
+        <a class="btn btn-outline-secondary" href="{% url 'water:home' %}">Refresh</a>
+      </div>
+    </div>
+
+    <!-- Global Statistics -->
+    <div class="row g-3 mb-4">
+      <div class="col-md-3">
+        <div class="card stat-card shadow-sm">
+          <div class="card-body text-center">
+            <h6 class="text-muted">Total Consumption</h6>
+            <h3 class="fw-bold">{{ stats.total_consumption_m3 }}</h3>
+            <small class="text-muted">m³ (today)</small>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="card stat-card shadow-sm">
+          <div class="card-body text-center">
+            <h6 class="text-muted">Active Meters</h6>
+            <h3 class="fw-bold">{{ stats.active_meters }}</h3>
+            <small class="text-muted">system-wide</small>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="card stat-card shadow-sm">
+          <div class="card-body text-center">
+            <h6 class="text-muted">Outstanding Bills</h6>
+            <h3 class="fw-bold">{{ stats.outstanding_bills }}</h3>
+            <small class="text-muted">unpaid accounts</small>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="card stat-card shadow-sm">
+          <div class="card-body text-center">
+            <h6 class="text-muted">Collection Rate</h6>
+            <h3 class="fw-bold">{{ stats.collection_rate }}%</h3>
+            <div class="progress mt-2">
+              <div class="progress-bar bg-success" role="progressbar" style="width: {{ stats.collection_rate }}%" aria-valuenow="{{ stats.collection_rate }}" aria-valuemin="0" aria-valuemax="100"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- System Overview Cards -->
+    <div class="row g-3 mb-4">
+      <div class="col-md-3">
+        <a href="{% url 'water:sites-list' %}" class="text-decoration-none">
+          <div class="card shadow-sm" style="cursor: pointer; transition: transform 0.2s, box-shadow 0.2s;" onmouseover="this.style.transform='translateY(-5px)'; this.style.boxShadow='0 10px 25px rgba(0,0,0,0.15)'" onmouseout="this.style.transform='none'; this.style.boxShadow='0 0.125rem 0.25rem rgba(0,0,0,0.075)'">
+            <div class="card-body">
+              <h6 class="card-title text-muted">Total Blocks</h6>
+              <h3 class="fw-bold">{{ total_sites }}</h3>
+            </div>
+          </div>
+        </a>
+      </div>
+      <div class="col-md-3">
+        <a href="{% url 'water:apartments-list' %}" class="text-decoration-none">
+          <div class="card shadow-sm" style="cursor: pointer; transition: transform 0.2s, box-shadow 0.2s;" onmouseover="this.style.transform='translateY(-5px)'; this.style.boxShadow='0 10px 25px rgba(0,0,0,0.15)'" onmouseout="this.style.transform='none'; this.style.boxShadow='0 0.125rem 0.25rem rgba(0,0,0,0.075)'">
+            <div class="card-body">
+              <h6 class="card-title text-muted">Total Apartments</h6>
+              <h3 class="fw-bold">{{ total_apartments }}</h3>
+            </div>
+          </div>
+        </a>
+      </div>
+      <div class="col-md-3">
+        <a href="{% url 'water:meters-list' %}" class="text-decoration-none">
+          <div class="card shadow-sm" style="cursor: pointer; transition: transform 0.2s, box-shadow 0.2s;" onmouseover="this.style.transform='translateY(-5px)'; this.style.boxShadow='0 10px 25px rgba(0,0,0,0.15)'" onmouseout="this.style.transform='none'; this.style.boxShadow='0 0.125rem 0.25rem rgba(0,0,0,0.075)'">
+            <div class="card-body">
+              <h6 class="card-title text-muted">Total Meters</h6>
+              <h3 class="fw-bold">{{ total_meters }}</h3>
+            </div>
+          </div>
+        </a>
+      </div>
+      <div class="col-md-3">
+        <a href="{% url 'water:admins-list' %}" class="text-decoration-none">
+          <div class="card shadow-sm" style="cursor: pointer; transition: transform 0.2s, box-shadow 0.2s;" onmouseover="this.style.transform='translateY(-5px)'; this.style.boxShadow='0 10px 25px rgba(0,0,0,0.15)'" onmouseout="this.style.transform='none'; this.style.boxShadow='0 0.125rem 0.25rem rgba(0,0,0,0.075)'">
+            <div class="card-body">
+              <h6 class="card-title text-muted">Block Admins</h6>
+              <h3 class="fw-bold">{{ total_admins }}</h3>
+            </div>
+          </div>
+        </a>
+      </div>
+    </div>
+
+    <div class="row">
+      <!-- Latest Readings -->
+      <div class="col-lg-8">
+        <div class="card shadow-sm mb-4">
+          <div class="card-body">
+            <h5 class="card-title">Latest Meter Readings</h5>
+            <div class="table-responsive">
+              <table class="table table-hover">
+                <thead>
+                  <tr>
+                    <th>Apartment</th>
+                    <th>Meter ID</th>
+                    <th>Consumption (m³)</th>
+                    <th>Bill ({{ currency_symbol }})</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for r in latest_readings %}
+                  <tr>
+                    <td>{{ r.apartment }}</td>
+                    <td>{{ r.meter_id }}</td>
+                    <td>{{ r.consumption }}</td>
+                    <td>{{ r.bill }}</td>
+                    <td>
+                      {% if r.status == 'Paid' %}
+                        <span class="badge bg-success">Paid</span>
+                      {% elif r.status == 'Unpaid' %}
+                        <span class="badge bg-danger">Unpaid</span>
+                      {% else %}
+                        <span class="badge bg-warning text-dark">{{ r.status }}</span>
+                      {% endif %}
+                    </td>
+                  </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Recent Bills -->
+      <div class="col-lg-4">
+        <div class="card shadow-sm">
+          <div class="card-body">
+            <h5 class="card-title">Recent Bills</h5>
+            <ul class="list-group list-group-flush">
+              {% for bill in recent_bills %}
+              <li class="list-group-item d-flex justify-content-between align-items-center">
+                <div>
+                  <strong>{{ bill.site.code }}</strong>
+                  {% if bill.apartment %}
+                    <br><small class="text-muted">Apt {{ bill.apartment.number }}</small>
+                  {% endif %}
+                  <br><small class="text-muted">{{ currency_symbol }}{{ bill.amount_due }}</small>
+                </div>
+                <span class="badge bg-primary">{{ bill.get_status_display }}</span>
+              </li>
+              {% empty %}
+              <li class="list-group-item text-muted">No recent bills</li>
+              {% endfor %}
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  {% include 'footer.html' %}
+
+  <script src="{% static 'js/bootstrap.bundle.min.js' %}"></script>
+</body>
+</html>

@@ -1,0 +1,109 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{{ title }}</title>
+  <link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet">
+  <link rel="stylesheet" href="{% static 'css/style.css' %}">
+  <style>
+    .table-hover tbody tr:hover { background-color: #f8f9fa; cursor: pointer; }
+  </style>
+</head>
+<body>
+  {% include 'navbar.html' %}
+
+  <main class="container my-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <h1 class="h3 mb-0">All Meters</h1>
+      <div>
+        <a class="btn btn-outline-secondary" href="{% url 'water:home' %}">← Back to Dashboard</a>
+      </div>
+    </div>
+
+    <div class="row mb-3">
+      <div class="col">
+        <p class="text-muted">Total Meters: <strong>{{ total_meters }}</strong></p>
+      </div>
+    </div>
+
+    {% if meter_data %}
+    <div class="card shadow-sm">
+      <div class="card-body">
+        <div class="table-responsive">
+          <table class="table table-hover mb-0">
+            <thead class="table-light">
+              <tr>
+                <th>Serial Number</th>
+                <th>Model</th>
+                <th>Block</th>
+                <th>Apartment</th>
+                <th>Status</th>
+                <th>Latest Reading</th>
+                <th>Installed</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for item in meter_data %}
+              <tr>
+                <td><strong>{{ item.meter.serial_number }}</strong></td>
+                <td>{{ item.meter.model }}</td>
+                <td>
+                  <a href="{% url 'water:block-dashboard' item.site.id %}" class="text-decoration-none">
+                    {{ item.site.code }}
+                  </a>
+                </td>
+                <td>
+                  {% if item.apartment %}
+                    <a href="{% url 'water:apartment-dashboard' item.apartment.id %}" class="text-decoration-none">
+                      Apt {{ item.apartment.number }}
+                    </a>
+                  {% else %}
+                    <span class="text-muted">—</span>
+                  {% endif %}
+                </td>
+                <td>
+                  {% if item.meter.status == 'active' %}
+                    <span class="badge bg-success">Active</span>
+                  {% elif item.meter.status == 'inactive' %}
+                    <span class="badge bg-secondary">Inactive</span>
+                  {% else %}
+                    <span class="badge bg-warning text-dark">{{ item.meter.get_status_display }}</span>
+                  {% endif %}
+                </td>
+                <td>
+                  {% if item.latest_reading %}
+                    <strong>{{ item.latest_reading.value|floatformat:2 }}</strong> {{ item.latest_reading.sensor.unit }}
+                    <br><small class="text-muted">{{ item.latest_reading.timestamp|date:"M d, H:i" }}</small>
+                  {% else %}
+                    <span class="text-muted">No readings</span>
+                  {% endif %}
+                </td>
+                <td>
+                  {% if item.meter.installed_at %}
+                    {{ item.meter.installed_at|date:"M d, Y" }}
+                  {% else %}
+                    <span class="text-muted">—</span>
+                  {% endif %}
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+    {% else %}
+    <div class="alert alert-info" role="alert">
+      No meters found in the system.
+    </div>
+    {% endif %}
+
+  </main>
+
+  {% include 'footer.html' %}
+
+  <script src="{% static 'js/bootstrap.bundle.min.js' %}"></script>
+</body>
+</html>

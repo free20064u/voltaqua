@@ -1,23 +1,14 @@
+{% comment %} legacy: redirect to dashboard view; kept for compatibility {% endcomment %}
 {% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ title }}</title>
-    <link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet">
-    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <meta http-equiv="refresh" content="0; url={% url 'water:water' %}">
+    <title>Redirecting…</title>
 </head>
 <body>
-    {% include 'navbar.html' %}
-
-    <main class="container py-5">
-        <h1 class="display-5">Water Services</h1>
-        <p class="lead">Overview of water distribution and monitoring features.</p>
-    </main>
-
-    {% include 'footer.html' %}
-
-    <script src="{% static 'js/bootstrap.bundle.min.js' %}"></script>
+    Redirecting to the dashboard…
 </body>
 </html>

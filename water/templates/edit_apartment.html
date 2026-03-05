@@ -1,0 +1,156 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{{ title }}</title>
+  <link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet">
+  <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+<body>
+  {% include 'navbar.html' %}
+
+  <main class="container my-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <h1 class="h3 mb-0">{{ title }}</h1>
+      <div>
+        <a class="btn btn-outline-secondary" href="{% url 'water:block-dashboard' site.id %}">← Back to Block</a>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-md-6">
+        <div class="card shadow-sm">
+          <div class="card-body">
+            <h5 class="card-title mb-4">Update Apartment Occupancy</h5>
+            
+            <div class="mb-3">
+              <label class="form-label"><strong>Block:</strong></label>
+              <p class="mb-0">{{ site.name }} ({{ site.code }})</p>
+            </div>
+
+            {% if form.non_field_errors %}
+            <div class="alert alert-danger">
+              {% for error in form.non_field_errors %}
+                <p>{{ error }}</p>
+              {% endfor %}
+            </div>
+            {% endif %}
+
+            <form method="post">
+              {% csrf_token %}
+
+              <div class="mb-3">
+                <label for="{{ form.number.id_for_label }}" class="form-label"><strong>Apartment Number</strong></label>
+                {{ form.number }}
+                {% if form.number.errors %}
+                  <div class="invalid-feedback d-block">
+                    {% for error in form.number.errors %}{{ error }}{% endfor %}
+                  </div>
+                {% endif %}
+              </div>
+
+              <div class="mb-3">
+                <label for="{{ form.occupants.id_for_label }}" class="form-label"><strong>Number of People</strong></label>
+                {{ form.occupants }}
+                {% if form.occupants.errors %}
+                  <div class="invalid-feedback d-block">
+                    {% for error in form.occupants.errors %}{{ error }}{% endfor %}
+                  </div>
+                {% endif %}
+                <small class="form-text text-muted">
+                  Enter the current number of residents living in this apartment. This is used to distribute the monthly water bill fairly.
+                </small>
+              </div>
+
+              <div class="d-grid gap-2">
+                <button type="submit" class="btn btn-primary">Save Changes</button>
+                <a href="{% url 'water:block-dashboard' site.id %}" class="btn btn-outline-secondary">Cancel</a>
+              </div>
+            </form>
+          </div>
+        </div>
+
+        <div class="card shadow-sm mt-4">
+          <div class="card-body">
+            <h6 class="card-title">About Occupancy</h6>
+            <p class="small text-muted mb-0">
+              The number of people living in an apartment is used to calculate their share of the monthly water bill. 
+              For example, if an apartment has 3 people out of 10 total residents in the block, that apartment will be charged 30% of the monthly block bill.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-6">
+        <div class="card shadow-sm bg-light">
+          <div class="card-body">
+            <h5 class="card-title">Current Information</h5>
+            
+            <div class="mb-3">
+              <label class="text-muted"><strong>Apartment Number:</strong></label>
+              <p class="mb-0">{{ apartment.number }}</p>
+            </div>
+
+            <div class="mb-3">
+              <label class="text-muted"><strong>Current Occupants:</strong></label>
+              <p class="mb-0">
+                <span class="badge bg-primary badge-lg" style="font-size: 1.1rem;">
+                  {{ apartment.occupants }} person{{ apartment.occupants|pluralize }}
+                </span>
+              </p>
+            </div>
+
+            <hr>
+
+            <label class="text-muted"><strong>Block Information:</strong></label>
+            <div class="mb-2">
+              <small>
+                <strong>Name:</strong> {{ site.name }}<br>
+                <strong>Code:</strong> {{ site.code }}<br>
+                <strong>Address:</strong> {{ site.address }}<br>
+                <strong>Total Apartments:</strong> {{ site.apartments.count }}
+              </small>
+            </div>
+
+            <hr>
+
+            <h6 class="text-muted">Block Occupancy Summary</h6>
+            <div class="table-responsive">
+              <table class="table table-sm table-hover mb-0">
+                <thead class="table-light">
+                  <tr>
+                    <th>Apt #</th>
+                    <th class="text-center">People</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for apt in site.apartments.all %}
+                  <tr {% if apt.id == apartment.id %}class="table-active"{% endif %}>
+                    <td>
+                      <strong>{{ apt.number }}</strong>
+                      {% if apt.id == apartment.id %}<span class="badge bg-info ms-1">This</span>{% endif %}
+                    </td>
+                    <td class="text-center">{{ apt.occupants }}</td>
+                  </tr>
+                  {% endfor %}
+                  <tr class="table-light fw-bold">
+                    <td>Total</td>
+                    <td class="text-center">{{ site.apartments.all|dictsort:"occupants"|length }}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  {% include 'footer.html' %}
+
+  <script src="{% static 'js/bootstrap.bundle.min.js' %}"></script>
+</body>
+</html>

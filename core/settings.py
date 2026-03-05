@@ -67,6 +67,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'core.context_processors.currency_symbol',
             ],
         },
     },
@@ -141,4 +142,7 @@ LOGOUT_REDIRECT_URL = 'base:home'
 # Media files (uploaded by users)
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
+
+# Local currency symbol (can be $ € £ ₦ etc.)
+LOCAL_CURRENCY_SYMBOL = 'GH₵'  # Ghana Cedis
 

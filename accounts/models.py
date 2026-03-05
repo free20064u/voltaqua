@@ -28,11 +28,18 @@ class UserManager(BaseUserManager):
 
 
 class User(AbstractBaseUser, PermissionsMixin):
+	USER_ROLE_CHOICES = [
+		('user', 'User (Resident)'),
+		('block_admin', 'Block Administrator'),
+		('superuser', 'Superuser'),
+	]
+
 	email = models.EmailField(unique=True)
 	first_name = models.CharField(max_length=150, blank=True)
 	last_name = models.CharField(max_length=150, blank=True)
 	is_active = models.BooleanField(default=True)
 	is_staff = models.BooleanField(default=False)
+	role = models.CharField(max_length=20, choices=USER_ROLE_CHOICES, default='user')
 	date_joined = models.DateTimeField(default=timezone.now)
 	# optional profile picture
 	profile_image = models.ImageField(upload_to='profiles/', blank=True, null=True)

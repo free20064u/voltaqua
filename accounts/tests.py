@@ -25,7 +25,7 @@ class AccountsAuthTests(TestCase):
         self.assertRedirects(resp, reverse('base:home'))
 
     def test_profile_image_upload(self):
-        self.client.login(username=self.email, password=self.password)
+        self.client.force_login(self.user)
         url = reverse('accounts:profile')
         # create a simple in-memory file
         from django.core.files.uploadedfile import SimpleUploadedFile

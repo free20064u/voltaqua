@@ -497,6 +497,7 @@ def enter_bill(request, site_id):
                             period_start=period_start,
                             period_end=period_end,
                             amount_due=round(apartment_share, 2),
+                            volume_consumed=round(volume_share, 2),
                             status='pending',
                             due_at=timezone.now() + timedelta(days=30),
                         )

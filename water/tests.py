@@ -67,7 +67,8 @@ class WaterDashboardTests(TestCase):
         )
 
     def test_dashboard_context(self):
-        response = self.client.get('/')  # water app is root in urlpatterns
+        self.client.force_login(self.superuser)
+        response = self.client.get('/water/')  # water app is at /water/
         self.assertEqual(response.status_code, 200)
         stats = response.context['stats']
         self.assertAlmostEqual(stats['total_consumption_m3'], 123.45)
@@ -156,19 +157,19 @@ class WaterDashboardTests(TestCase):
         """Clicking the water link (root) should deliver the correct dashboard."""
         # superuser
         self.client.force_login(self.superuser)
-        resp = self.client.get('/')
+        resp = self.client.get('/water/')
         self.assertEqual(resp.status_code, 200)
         self.assertTemplateUsed(resp, 'superuser_dashboard.html')
 
         # block admin
         self.client.force_login(self.block_admin)
-        resp = self.client.get('/')
+        resp = self.client.get('/water/')
         self.assertEqual(resp.status_code, 200)
         self.assertTemplateUsed(resp, 'block_admin_dashboard.html')
 
         # regular user
         self.client.force_login(self.regular_user)
-        resp = self.client.get('/')
+        resp = self.client.get('/water/')
         self.assertEqual(resp.status_code, 200)
         self.assertTemplateUsed(resp, 'user_dashboard.html')
 

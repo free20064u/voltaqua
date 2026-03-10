@@ -1,0 +1,89 @@
+{% extends 'base/base.html' %}
+{% load static %}
+
+{% block content %}
+  <style>
+    .stat-card { min-height:120px }
+    .welcome-card { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; }
+  </style>
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <h1 class="h3 mb-0">{{ entity_name }} (Resident)</h1>
+      <div>
+        <a class="btn btn-outline-secondary" href="{% url 'water:dashboard' %}">Refresh</a>
+      </div>
+    </div>
+
+    <!-- Welcome Card -->
+    <div class="card welcome-card shadow-sm mb-4">
+      <div class="card-body">
+        <h5 class="card-title">Welcome, Resident!</h5>
+        <p class="mb-0">{{ message }}</p>
+      </div>
+    </div>
+
+    <!-- Placeholder Content -->
+    <div class="row g-3">
+      <div class="col-md-6">
+        <div class="card shadow-sm">
+          <div class="card-body">
+            <h5 class="card-title">My Water Consumption</h5>
+            <p class="text-muted">Your apartment water usage data will appear here once linked to your account.</p>
+            <hr>
+            <div class="alert alert-info" role="alert">
+              <small>Contact your block administrator to link your apartment to your account.</small>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-6">
+        <div class="card shadow-sm">
+          <div class="card-body">
+            <h5 class="card-title">My Billing</h5>
+            <p class="text-muted">Your water bill information will appear here once processed.</p>
+            <hr>
+            <div class="alert alert-info" role="alert">
+              <small>Bills are typically issued monthly by your block administrator.</small>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Additional Features (Future) -->
+    <div class="row g-3 mt-2">
+      <div class="col-md-12">
+        <div class="card shadow-sm">
+          <div class="card-body">
+            <h5 class="card-title">Features Coming Soon</h5>
+            <ul class="list-group list-group-flush">
+              <li class="list-group-item">
+                <strong>📊 Usage Analytics</strong> - Track your water consumption trends over time
+              </li>
+              <li class="list-group-item">
+                <strong>💰 Payment Tracking</strong> - View and download monthly invoices
+              </li>
+              <li class="list-group-item">
+                <strong>🔔 Alerts</strong> - Receive notifications about unusual water usage
+              </li>
+              <li class="list-group-item">
+                <strong>📱 Mobile App</strong> - Access your account on the go
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Support Section -->
+    <div class="row g-3 mt-2">
+      <div class="col-md-12">
+        <div class="card shadow-sm bg-light">
+          <div class="card-body">
+            <h5 class="card-title">Need Help?</h5>
+            <p>If you have questions about your water bill or need to report a leak, please contact your block administrator or visit the <a href="{% url 'base:about' %}">Help & Support</a> page.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+{% endblock %}

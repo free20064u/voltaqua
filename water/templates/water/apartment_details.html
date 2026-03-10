@@ -1,0 +1,123 @@
+{% extends 'base/base.html' %}
+{% load static %}
+
+{% block content %}
+  <style>
+    .stat-card { min-height:120px }
+    .table-actions a { margin-right: .4rem }
+  </style>
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <h1 class="h3 mb-0">{{ entity_name }} — Water Dashboard</h1>
+      <div>
+        <a class="btn btn-outline-secondary" href="{% url 'water:apartment-dashboard' apartment.id %}">Refresh</a>
+        <a class="btn btn-primary" href="{% url 'water:dashboard' %}">Back to Dashboard</a>
+      </div>
+    </div>
+
+    <!-- Apartment Statistics -->
+    <div class="row g-3 mb-3">
+      <div class="col-6 col-md-4 col-lg-2">
+        <div class="card stat-card shadow-sm">
+          <div class="card-body text-center">
+            <h6 class="text-muted">Total Consumption</h6>
+            <h3 class="fw-bold">{{ stats.total_consumption_all_time }}</h3>
+            <small class="text-muted">m³ (all time)</small>
+          </div>
+        </div>
+      </div>
+      <div class="col-6 col-md-4 col-lg-2">
+        <div class="card stat-card shadow-sm">
+          <div class="card-body text-center">
+            <h6 class="text-muted">Active Meters</h6>
+            <h3 class="fw-bold">{{ stats.active_meters }}</h3>
+            <small class="text-muted">in apartment</small>
+          </div>
+        </div>
+      </div>
+      <div class="col-6 col-md-4 col-lg-2">
+        <div class="card stat-card shadow-sm">
+          <div class="card-body text-center">
+            <h6 class="text-muted">Total Paid</h6>
+            <h3 class="fw-bold">{{ stats.total_paid }}</h3>
+            <small class="text-muted">collected</small>
+          </div>
+        </div>
+      </div>
+      <div class="col-6 col-md-4 col-lg-2">
+        <div class="card stat-card shadow-sm">
+          <div class="card-body text-center">
+            <h6 class="text-muted">Outstanding Bills</h6>
+            <h3 class="fw-bold">{{ stats.outstanding_bills }}</h3>
+            <small class="text-muted">unpaid</small>
+          </div>
+        </div>
+      </div>
+      <div class="col">
+        <div class="card stat-card shadow-sm">
+          <div class="card-body text-center">
+            <h6 class="text-muted">Collection Rate</h6>
+            <h3 class="fw-bold">{{ stats.collection_rate }}%</h3>
+            <div class="progress mt-2">
+              <div class="progress-bar bg-success" role="progressbar" style="width: {{ stats.collection_rate }}%" aria-valuenow="{{ stats.collection_rate }}" aria-valuemin="0" aria-valuemax="100"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Apartment Information -->
+    {% if apartment %}
+    <div class="card shadow-sm mb-4">
+      <div class="card-body">
+        <h5 class="card-title">Apartment Information</h5>
+        <div class="row">
+          <div class="col-md-6">
+            <p><strong>Unit Number:</strong> {{ apartment.number }}</p>
+            <p><strong>Block:</strong> {{ apartment.site.name }} ({{ apartment.site.code }})</p>
+          </div>
+          <div class="col-md-6">
+            <p><strong>Occupants:</strong> {{ apartment.occupants }}</p>
+            <p><strong>Created:</strong> {{ apartment.created_at|date:"M d, Y" }}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+    {% endif %}
+
+    <div class="row">
+      <!-- Summary Card -->
+      <div class="col-lg-12">
+        <div class="card shadow-sm">
+          <div class="card-body">
+            <h5 class="card-title">Summary</h5>
+            <ul class="list-group list-group-flush">
+              <li class="list-group-item d-flex justify-content-between">
+                <span>Total Consumption (All Time)</span>
+                <strong>{{ stats.total_consumption_all_time }} m³</strong>
+              </li>
+              <li class="list-group-item d-flex justify-content-between">
+                <span>Active Meters</span>
+                <strong>{{ stats.active_meters }}</strong>
+              </li>
+              <li class="list-group-item d-flex justify-content-between">
+                <span>Unpaid Bills</span>
+                <strong>{{ stats.outstanding_bills }}</strong>
+              </li>
+              <li class="list-group-item d-flex justify-content-between">
+                <span>Collection Rate</span>
+                <strong>{{ stats.collection_rate }}%</strong>
+              </li>
+            </ul>
+            <div class="d-grid gap-2 mt-3">
+                <a href="{% url 'water:apartment-payment-history' apartment.id %}" class="btn btn-outline-info">
+                    View Payment History
+                </a>
+                <a href="{% url 'water:apartment-bill-list' apartment.id %}" class="btn btn-outline-secondary">
+                    View Bill History
+                </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+{% endblock %}

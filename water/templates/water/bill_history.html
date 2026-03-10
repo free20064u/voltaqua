@@ -1,0 +1,64 @@
+{% extends 'base/base.html' %}
+{% load static %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <h1 class="h3 mb-0">{{ title }}</h1>
+      <div>
+        <a class="btn btn-outline-secondary" href="{% url 'water:apartment-dashboard' apartment.id %}">← Back to Dashboard</a>
+      </div>
+    </div>
+
+    <div class="card shadow-sm">
+      <div class="card-body">
+        <div class="table-responsive">
+          <table class="table table-hover align-middle">
+            <thead class="table-light">
+              <tr>
+                <th>Period</th>
+                <th>Issued</th>
+                <th>Amount Due</th>
+                <th>Paid</th>
+                <th>Balance</th>
+                <th>Status</th>
+                <th class="text-end">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for bill in bills %}
+              <tr>
+                <td>{{ bill.period_start|date:"M d" }} - {{ bill.period_end|date:"M d, Y" }}</td>
+                <td>{{ bill.issued_at|date:"M d, Y" }}</td>
+                <td>{{ bill.currency }} {{ bill.amount_due }}</td>
+                <td>{{ bill.currency }} {{ bill.total_paid }}</td>
+                <td><strong>{{ bill.currency }} {{ bill.balance }}</strong></td>
+                <td>
+                  {% if bill.status == 'paid' %}
+                    <span class="badge bg-success">Paid</span>
+                  {% elif bill.status == 'pending' %}
+                    <span class="badge bg-warning text-dark">Pending</span>
+                  {% else %}
+                    <span class="badge bg-danger">{{ bill.status|title }}</span>
+                  {% endif %}
+                </td>
+                <td class="text-end">
+                  {% if bill.status != 'paid' and request.user.role == 'block_admin' %}
+                    <a href="{% url 'water:record-payment' bill.id %}" class="btn btn-sm btn-outline-success">
+                      Record Payment
+                    </a>
+                  {% endif %}
+                </td>
+              </tr>
+              {% empty %}
+              <tr>
+                <td colspan="7" class="text-center text-muted py-4">No bills found for this apartment.</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+{% endblock %}

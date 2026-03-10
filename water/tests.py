@@ -3,7 +3,7 @@ from django.utils import timezone
 
 from accounts.models import User
 from .models import (
-    Site, Apartment, Meter, Sensor, Reading, ConsumptionSummary,
+    Site, Apartment, Meter, ConsumptionSummary,
     Bill, Payment
 )
 from .models import BillOccupancy
@@ -35,7 +35,6 @@ class WaterDashboardTests(TestCase):
             user=self.block_admin
         )
         self.meter = Meter.objects.create(site=self.site, serial_number="MTR-100")
-        self.sensor = Sensor.objects.create(meter=self.meter, sensor_type=Sensor.SensorType.FLOW)
 
         today = timezone.now().date()
         ConsumptionSummary.objects.create(
@@ -58,14 +57,6 @@ class WaterDashboardTests(TestCase):
         # partial payment to test percentage calculation
         Payment.objects.create(bill=self.bill, amount=50, paid_at=timezone.now())
 
-        # create a recent reading
-        Reading.objects.create(
-            sensor=self.sensor,
-            meter=self.meter,
-            timestamp=timezone.now(),
-            value=10.0,
-        )
-
     def test_dashboard_context(self):
         self.client.force_login(self.superuser)
         response = self.client.get('/water/')  # water app is at /water/
@@ -77,17 +68,11 @@ class WaterDashboardTests(TestCase):
         # collection rate should be (50/200)*100 == 25
         self.assertEqual(stats['collection_rate'], 25)
 
-        readings = response.context['latest_readings']
-        self.assertTrue(len(readings) >= 1)
-        first = readings[0]
-        self.assertEqual(first['meter_id'], 'MTR-100')
-        self.assertEqual(first['consumption'], 10.0)
-
     def test_block_and_apartment_dashboards(self):
         # login as block admin
         self.client.force_login(self.block_admin)
 
-        # create a second apartment with its own meter/reading
+        # create a second apartment with its own meter
         block = self.site  # our site acts as block
         apt1 = Apartment.objects.create(site=block, number="1A", occupants=3)
         apt2 = Apartment.objects.create(site=block, number="1B", occupants=2)
@@ -96,7 +81,6 @@ class WaterDashboardTests(TestCase):
         self.meter.save()
         # add a second meter and reading for apt2
         meter2 = Meter.objects.create(site=block, apartment=apt2, serial_number="MTR-101")
-        Reading.objects.create(sensor=self.sensor, meter=meter2, timestamp=timezone.now(), value=5)
 
         # bills attached to apartments
         bill1 = Bill.objects.create(user=self.block_admin, site=block, apartment=apt1,

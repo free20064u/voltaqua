@@ -27,10 +27,20 @@ class CustomAuthenticationForm(AuthenticationForm):
 
 
 class UserCreationForm(forms.ModelForm):
+    ROLE_CHOICES = (
+        ('user', 'Resident (I want to join a block)'),
+        ('block_admin', 'Block Admin (I want to manage a block)'),
+    )
+    role = forms.ChoiceField(
+        choices=ROLE_CHOICES,
+        widget=forms.RadioSelect,
+        required=True,
+        label="I am a..."
+    )
 
     class Meta:
         model = User
-        fields = ('email', 'first_name', 'last_name', 'profile_image')
+        fields = ('email', 'first_name', 'last_name', 'role', 'profile_image')
         widgets = {
             'email': forms.EmailInput(attrs={'class': 'form-control'}),
             'first_name': forms.TextInput(attrs={'class': 'form-control'}),

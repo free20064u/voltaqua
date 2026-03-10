@@ -58,7 +58,7 @@ The water app now supports separate dashboards for **blocks** (treated as `Site`
 2. **Block Admin** (`role='block_admin'`) – Assigned to a specific block (`Site.user`); can only view dashboards for their assigned block and its apartments.
 3. **User** (`role='user'`) – Regular resident/occupant; cannot view block or apartment dashboards (may view global overview in future).
 
-Each block may be assigned to a single block admin user via the ``user`` field on `Site`; this user will automatically have permission to view that block's dashboard and the dashboards of any apartments within it. Only superusers can view blocks/apartments they do not own. Administrators can register apartments under a block; meters, readings and bills may be associated with specific apartments to enable fair distribution of the compound bill.
+Each block may be assigned to a single block admin user via the ``user`` field on `Site`; this user will automatically have permission to view that block's dashboard and the dashboards of any apartments within it. Only superusers can view blocks/apartments they do not own. Administrators can register apartments under a block; meters and bills may be associated with specific apartments to enable fair distribution of the compound bill.
 
 Use the following URLs to access the water management system:
 

@@ -5,11 +5,11 @@ def home(request):
     context = {
         'title': 'Utility Bill Distribution Management System'
     }
-    return render(request, 'home.html', context)
+    return render(request, 'base/home.html', context)
 
 
 def about(request):
     context = {
         'title': 'About — Voltaqua'
     }
-    return render(request, 'about.html', context)
+    return render(request, 'base/about.html', context)

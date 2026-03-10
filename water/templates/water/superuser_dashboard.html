@@ -1,0 +1,193 @@
+{% extends 'base/base.html' %}
+{% load static %}
+
+{% block content %}
+  <style>
+    .stat-card { min-height:120px }
+    .table-actions a { margin-right: .4rem }
+  </style>
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <h1 class="h3 mb-0">{{ entity_name }} Dashboard (Superuser)</h1>
+      <div>
+        <a class="btn btn-outline-secondary" href="{% url 'water:dashboard' %}">Refresh</a>
+      </div>
+    </div>
+
+    <!-- Global Statistics -->
+    <div class="row g-3 mb-4 row-cols-2 row-cols-md-5">
+      <div class="col">
+        <div class="card stat-card shadow-sm">
+          <div class="card-body text-center">
+            <h6 class="text-muted">Total Consumption</h6>
+            <h3 class="fw-bold">{{ stats.total_consumption_all_time }}</h3>
+            <small class="text-muted">m³ (all time)</small>
+          </div>
+        </div>
+      </div>
+      <div class="col">
+        <div class="card stat-card shadow-sm">
+          <div class="card-body text-center">
+            <h6 class="text-muted">Active Meters</h6>
+            <h3 class="fw-bold">{{ stats.active_meters }}</h3>
+            <small class="text-muted">system-wide</small>
+          </div>
+        </div>
+      </div>
+      <div class="col">
+        <div class="card stat-card shadow-sm">
+          <div class="card-body text-center">
+            <h6 class="text-muted">Total Paid</h6>
+            <h3 class="fw-bold">{{ stats.total_paid }}</h3>
+            <small class="text-muted">collected</small>
+          </div>
+        </div>
+      </div>
+      <div class="col">
+        <div class="card stat-card shadow-sm">
+          <div class="card-body text-center">
+            <h6 class="text-muted">Outstanding Bills</h6>
+            <h3 class="fw-bold">{{ stats.outstanding_bills }}</h3>
+            <small class="text-muted">unpaid accounts</small>
+          </div>
+        </div>
+      </div>
+      <div class="col">
+        <div class="card stat-card shadow-sm">
+          <div class="card-body text-center">
+            <h6 class="text-muted">Collection Rate</h6>
+            <h3 class="fw-bold">{{ stats.collection_rate }}%</h3>
+            <div class="progress mt-2">
+              <div class="progress-bar bg-success" role="progressbar" style="width: {{ stats.collection_rate }}%" aria-valuenow="{{ stats.collection_rate }}" aria-valuemin="0" aria-valuemax="100"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- System Overview Cards -->
+    <div class="row g-3 mb-4">
+      <div class="col-6 col-md-3">
+        <a href="{% url 'water:sites-list' %}" class="text-decoration-none">
+          <div class="card shadow-sm" style="cursor: pointer; transition: transform 0.2s, box-shadow 0.2s;" onmouseover="this.style.transform='translateY(-5px)'; this.style.boxShadow='0 10px 25px rgba(0,0,0,0.15)'" onmouseout="this.style.transform='none'; this.style.boxShadow='0 0.125rem 0.25rem rgba(0,0,0,0.075)'">
+            <div class="card-body">
+              <h6 class="card-title text-muted">Total Blocks</h6>
+              <h3 class="fw-bold">{{ total_sites }}</h3>
+            </div>
+          </div>
+        </a>
+      </div>
+      <div class="col-6 col-md-3">
+        <a href="{% url 'water:apartments-list' %}" class="text-decoration-none">
+          <div class="card shadow-sm" style="cursor: pointer; transition: transform 0.2s, box-shadow 0.2s;" onmouseover="this.style.transform='translateY(-5px)'; this.style.boxShadow='0 10px 25px rgba(0,0,0,0.15)'" onmouseout="this.style.transform='none'; this.style.boxShadow='0 0.125rem 0.25rem rgba(0,0,0,0.075)'">
+            <div class="card-body">
+              <h6 class="card-title text-muted">Total Apartments</h6>
+              <h3 class="fw-bold">{{ total_apartments }}</h3>
+            </div>
+          </div>
+        </a>
+      </div>
+      <div class="col-6 col-md-3">
+        <a href="{% url 'water:meters-list' %}" class="text-decoration-none">
+          <div class="card shadow-sm" style="cursor: pointer; transition: transform 0.2s, box-shadow 0.2s;" onmouseover="this.style.transform='translateY(-5px)'; this.style.boxShadow='0 10px 25px rgba(0,0,0,0.15)'" onmouseout="this.style.transform='none'; this.style.boxShadow='0 0.125rem 0.25rem rgba(0,0,0,0.075)'">
+            <div class="card-body">
+              <h6 class="card-title text-muted">Total Meters</h6>
+              <h3 class="fw-bold">{{ total_meters }}</h3>
+            </div>
+          </div>
+        </a>
+      </div>
+      <div class="col-6 col-md-3">
+        <a href="{% url 'water:admins-list' %}" class="text-decoration-none">
+          <div class="card shadow-sm" style="cursor: pointer; transition: transform 0.2s, box-shadow 0.2s;" onmouseover="this.style.transform='translateY(-5px)'; this.style.boxShadow='0 10px 25px rgba(0,0,0,0.15)'" onmouseout="this.style.transform='none'; this.style.boxShadow='0 0.125rem 0.25rem rgba(0,0,0,0.075)'">
+            <div class="card-body">
+              <h6 class="card-title text-muted">Block Admins</h6>
+              <h3 class="fw-bold">{{ total_admins }}</h3>
+            </div>
+          </div>
+        </a>
+      </div>
+    </div>
+
+    <div class="row">
+      <!-- Recent Bills -->
+      <div class="col-lg-12">
+        <div class="card shadow-sm">
+          <div class="card-body">
+            <h5 class="card-title">Recent Bills</h5>
+            <div class="table-responsive">
+              <table class="table table-hover">
+                <thead>
+                  <tr>
+                    <th>Site</th>
+                    <th>Apartment</th>
+                    <th>User</th>
+                    <th>Amount</th>
+                    <th>Status</th>
+                    <th>Issued On</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for bill in recent_bills %}
+                  <tr>
+                    <td>
+                      <a href="{% url 'water:block-dashboard' bill.site.id %}">{{ bill.site.code }}</a>
+                    </td>
+                    <td>
+                      {% if bill.apartment %}
+                        <a href="{% url 'water:apartment-dashboard' bill.apartment.id %}">Apt {{ bill.apartment.number }}</a>
+                      {% else %}
+                        <span class="text-muted">—</span>
+                      {% endif %}
+                    </td>
+                    <td>
+                      {% if bill.apartment and bill.apartment.user %}
+                        {{ bill.apartment.user.first_name }} {{ bill.apartment.user.last_name }}
+                      {% else %}
+                        <span class="text-muted">—</span>
+                      {% endif %}
+                    </td>
+                    <td>{{ bill.currency }} {{ bill.amount_due|floatformat:2 }}</td>
+                    <td>
+                      <span class="badge {% if bill.status == 'paid' %}bg-success{% elif bill.status == 'pending' %}bg-warning text-dark{% else %}bg-danger{% endif %}">{{ bill.status|title }}</span>
+                    </td>
+                    <td>{{ bill.issued_at|date:"M d, Y" }}</td>
+                  </tr>
+                  {% empty %}
+                  <tr>
+                    <td colspan="6" class="text-center text-muted">No recent bills found.</td>
+                  </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+            
+            {% if recent_bills.has_other_pages %}
+            <nav aria-label="Page navigation" class="mt-4">
+              <ul class="pagination justify-content-center">
+                {% if recent_bills.has_previous %}
+                  <li class="page-item"><a class="page-link" href="?page={{ recent_bills.previous_page_number }}">Previous</a></li>
+                {% else %}
+                  <li class="page-item disabled"><span class="page-link">Previous</span></li>
+                {% endif %}
+
+                {% for i in recent_bills.paginator.page_range %}
+                  {% if recent_bills.number == i %}
+                    <li class="page-item active" aria-current="page"><span class="page-link">{{ i }}</span></li>
+                  {% else %}
+                    <li class="page-item"><a class="page-link" href="?page={{ i }}">{{ i }}</a></li>
+                  {% endif %}
+                {% endfor %}
+
+                {% if recent_bills.has_next %}
+                  <li class="page-item"><a class="page-link" href="?page={{ recent_bills.next_page_number }}">Next</a></li>
+                {% else %}
+                  <li class="page-item disabled"><span class="page-link">Next</span></li>
+                {% endif %}
+              </ul>
+            </nav>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    </div>
+{% endblock %}

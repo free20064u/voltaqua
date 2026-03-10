@@ -1,0 +1,45 @@
+{% extends 'base/base.html' %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8 col-lg-6">
+        <div class="card shadow-sm mt-4">
+            <div class="card-body p-4">
+                <h2 class="text-center mb-4">Join Your Block</h2>
+                <p class="text-muted text-center mb-4">
+                    Welcome! To access your water dashboard, please enter the Site Code provided by your Block Administrator.
+                </p>
+
+                <form method="post">
+                    {% csrf_token %}
+                    
+                    <div class="mb-3">
+                        <label for="site_code" class="form-label">Site Code</label>
+                        <input type="text" class="form-control form-control-lg" id="site_code" name="site_code" placeholder="e.g. SUN-001" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="apt_number" class="form-label">Your Apartment Number</label>
+                        <input type="text" class="form-control" id="apt_number" name="apt_number" placeholder="e.g. A4 or 12" required>
+                        <div class="form-text">
+                            If your apartment doesn't exist in the system yet, it will be created for you.
+                        </div>
+                    </div>
+
+                    <div class="d-grid gap-2 mt-4">
+                        <button type="submit" class="btn btn-primary btn-lg">Join Dashboard</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <div class="text-center mt-3">
+            <p class="small text-muted">
+                Don't have a code? Contact your building manager.<br>
+                <a href="{% url 'accounts:logout' %}">Log out</a>
+            </p>
+        </div>
+    </div>
+</div>
+{% endblock %}

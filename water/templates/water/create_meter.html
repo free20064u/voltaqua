@@ -1,0 +1,39 @@
+{% extends 'base/base.html' %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8 col-lg-6">
+        <div class="card shadow-sm mt-4">
+            <div class="card-body p-4">
+                <h2 class="text-center mb-4">Register Block Meter</h2>
+                <p class="text-muted text-center mb-4">
+                    Almost there! Please register the main water meter for your block.
+                </p>
+
+                <form method="post">
+                    {% csrf_token %}
+                    
+                    <div class="mb-3">
+                        <label for="serial_number" class="form-label">Meter Serial Number</label>
+                        <input type="text" class="form-control" id="serial_number" name="serial_number" placeholder="e.g. MTR-12345678" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="model" class="form-label">Meter Model</label>
+                        <input type="text" class="form-control" id="model" name="model" placeholder="e.g. Sensus iPerl">
+                    </div>
+
+                    <div class="d-grid gap-2 mt-4">
+                        <button type="submit" class="btn btn-primary btn-lg">Register Meter</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <div class="text-center mt-3">
+            <a href="{% url 'accounts:logout' %}" class="text-muted">Log out</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

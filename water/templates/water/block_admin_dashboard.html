@@ -1,0 +1,203 @@
+{% extends 'base/base.html' %}
+{% load static %}
+
+{% block content %}
+  <style>
+    .stat-card { min-height:120px }
+    .table-actions a { margin-right: .4rem }
+    .apartment-card { border-left: 4px solid #0d6efd; }
+  </style>
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <h1 class="h3 mb-0">{{ entity_name }} Dashboard (Block Admin)</h1>
+      <div>
+        <a class="btn btn-outline-secondary" href="{% url 'water:dashboard' %}">Refresh</a>
+        <a class="btn btn-primary" href="{% url 'water:block-dashboard' site.id %}">View Full Block</a>
+      </div>
+    </div>
+
+    <!-- Block-level Statistics -->
+    <div class="row g-3 mb-3">
+      <div class="col-6 col-md-4 col-lg-2">
+        <div class="card stat-card shadow-sm">
+          <div class="card-body text-center">
+            <h6 class="text-muted">Total Consumption</h6>
+            <h3 class="fw-bold">{{ stats.total_consumption_all_time }}</h3>
+            <small class="text-muted">m³ (all time)</small>
+          </div>
+        </div>
+      </div>
+      <div class="col-6 col-md-4 col-lg-2">
+        <div class="card stat-card shadow-sm">
+          <div class="card-body text-center">
+            <h6 class="text-muted">Active Meters</h6>
+            <h3 class="fw-bold">{{ stats.active_meters }}</h3>
+            <small class="text-muted">in block</small>
+          </div>
+        </div>
+      </div>
+      <div class="col-6 col-md-4 col-lg-2">
+        <div class="card stat-card shadow-sm">
+          <div class="card-body text-center">
+            <h6 class="text-muted">Total Paid</h6>
+            <h3 class="fw-bold">{{ stats.total_paid }}</h3>
+            <small class="text-muted">collected</small>
+          </div>
+        </div>
+      </div>
+      <div class="col-6 col-md-4 col-lg-2">
+        <div class="card stat-card shadow-sm">
+          <div class="card-body text-center">
+            <h6 class="text-muted">Outstanding Bills</h6>
+            <h3 class="fw-bold">{{ stats.outstanding_bills }}</h3>
+            <small class="text-muted">unpaid</small>
+          </div>
+        </div>
+      </div>
+      <div class="col">
+        <div class="card stat-card shadow-sm">
+          <div class="card-body text-center">
+            <h6 class="text-muted">Collection Rate</h6>
+            <h3 class="fw-bold">{{ stats.collection_rate }}%</h3>
+            <div class="progress mt-2">
+              <div class="progress-bar bg-success" role="progressbar" style="width: {{ stats.collection_rate }}%" aria-valuenow="{{ stats.collection_rate }}" aria-valuemin="0" aria-valuemax="100"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Block Info Card -->
+    {% if site %}
+    <div class="card shadow-sm mb-4">
+      <div class="card-body">
+        <h5 class="card-title">Block Information</h5>
+        <div class="row">
+          <div class="col-md-6">
+            <p><strong>Block Name:</strong> {{ site.name }}</p>
+            <p><strong>Block Code:</strong> {{ site.code }}</p>
+            <p><strong>Address:</strong> {{ site.address|default:"N/A" }}</p>
+          </div>
+          <div class="col-md-6">
+            <p><strong>Timezone:</strong> {{ site.timezone }}</p>
+            <p><strong>Total Apartments:</strong> {{ total_apartments }}</p>
+            <p><strong>Created:</strong> {{ site.created_at|date:"M d, Y" }}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+    {% else %}
+    <div class="alert alert-warning" role="alert">
+      {{ message }}
+    </div>
+    {% endif %}
+
+    <div class="row">
+      <!-- Apartments in Block -->
+      <div class="col-lg-8">
+        <div class="card shadow-sm mb-4">
+          <div class="card-body">
+            <h5 class="card-title">Apartments in Block</h5>
+            <div class="mb-3">
+              {% if request.user.role == 'block_admin' %}
+              <a href="{% url 'water:enter-bill' site.id %}" class="btn btn-success btn-sm">
+                + Add Monthly Bill
+              </a>
+              {% endif %}
+            </div>
+            {% if apartments %}
+            <div class="row g-3">
+              {% for item in apartments %}
+              <div class="col-md-6">
+                <div class="card apartment-card h-100">
+                  <div class="card-body">
+                    <h6 class="card-title">Apt {{ item.apartment.number }}</h6>
+                    <p class="text-muted small mb-2">
+                      👥 Occupants: <strong>{{ item.apartment.occupants }}</strong>
+                    </p>
+                    <dl class="row mb-3">
+                      <dt class="col-sm-6 text-muted small">Total Consumption:</dt>
+                      <dd class="col-sm-6 text-end small"><strong>{{ item.stats.total_consumption_all_time }} m³</strong></dd>
+                      <dt class="col-sm-6 text-muted small">Unpaid Bills:</dt>
+                      <dd class="col-sm-6 text-end small"><strong>{{ item.stats.outstanding_bills }}</strong></dd>
+                    </dl>
+                    <div class="d-flex gap-2">
+                      <a href="{% url 'water:apartment-dashboard' item.apartment.id %}" class="btn btn-sm btn-outline-primary flex-grow-1">View</a>
+                      {% if request.user.role == 'block_admin' %}
+                      <a href="{% url 'water:edit-apartment' item.apartment.id %}" class="btn btn-sm btn-outline-info">Edit Occupants</a>
+                      {% endif %}
+                    </div>
+                  </div>
+                </div>
+              </div>
+              {% endfor %}
+            </div>
+            {% else %}
+            <p class="text-muted">No apartments in this block yet.</p>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+
+      <!-- Recent Readings & Bills -->
+      <div class="col-lg-4">
+        <div class="card shadow-sm">
+          <div class="card-body">
+            <h5 class="card-title">Recent Bills</h5>
+            <div class="table-responsive">
+              <table class="table table-hover">
+                <thead>
+                  <tr>
+                    <th>Apartment</th>
+                    <th>User</th>
+                    <th>Amount</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for bill in recent_bills %}
+                  <tr>
+                    <td>
+                      {% if bill.apartment %}
+                        <a href="{% url 'water:apartment-dashboard' bill.apartment.id %}">Apt {{ bill.apartment.number }}</a>
+                      {% else %}
+                        Block Bill
+                      {% endif %}
+                    </td>
+                    <td>
+                      {% if bill.apartment and bill.apartment.user %}
+                        {{ bill.apartment.user.first_name }} {{ bill.apartment.user.last_name }}
+                      {% else %}
+                        <span class="text-muted">—</span>
+                      {% endif %}
+                    </td>
+                    <td>{{ bill.currency }} {{ bill.amount_due|floatformat:2 }}</td>
+                    <td><span class="badge {% if bill.status == 'paid' %}bg-success{% elif bill.status == 'pending' %}bg-warning text-dark{% else %}bg-danger{% endif %}">{{ bill.status|title }}</span></td>
+                    <td>
+                      {% if bill.status != 'paid' and request.user.role == 'block_admin' %}
+                        <a href="{% url 'water:record-payment' bill.id %}" class="btn btn-sm btn-outline-success">Pay</a>
+                      {% endif %}
+                    </td>
+                  </tr>
+                  {% empty %}
+                  <tr><td colspan="5" class="text-center text-muted">No bills found.</td></tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+            {% if recent_bills.has_other_pages %}
+            <nav aria-label="Page navigation" class="mt-4">
+              <ul class="pagination justify-content-center">
+                {% if recent_bills.has_previous %}<li class="page-item"><a class="page-link" href="?page={{ recent_bills.previous_page_number }}">Previous</a></li>{% else %}<li class="page-item disabled"><span class="page-link">Previous</span></li>{% endif %}
+                {% for i in recent_bills.paginator.page_range %}
+                  {% if recent_bills.number == i %}<li class="page-item active" aria-current="page"><span class="page-link">{{ i }}</span></li>{% else %}<li class="page-item"><a class="page-link" href="?page={{ i }}">{{ i }}</a></li>{% endif %}
+                {% endfor %}
+                {% if recent_bills.has_next %}<li class="page-item"><a class="page-link" href="?page={{ recent_bills.next_page_number }}">Next</a></li>{% else %}<li class="page-item disabled"><span class="page-link">Next</span></li>{% endif %}
+              </ul>
+            </nav>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    </div>
+{% endblock %}

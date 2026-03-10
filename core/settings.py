@@ -25,12 +25,13 @@ SECRET_KEY = 'django-insecure-4262g$yz^-l)1_o+nr7nl5mof9_-6@jr6a#y(i_5!0ao%uw8h^
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']  # Allow all hosts during development, change in production
 
 
 # Application definition
 
 INSTALLED_APPS = [
+    'channels',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -39,7 +40,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'accounts',
     'base',
-    'water',
+    'water.apps.WaterConfig',
     'electric',
 ]
 
@@ -75,6 +76,15 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'core.wsgi.application'
 
+# Tell Django to use the ASGI application for Channels
+ASGI_APPLICATION = 'core.asgi.application'
+
+# Channel layer configuration (using in-memory for development)
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'channels.layers.InMemoryChannelLayer',
+    },
+}
 
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
@@ -145,4 +155,3 @@ MEDIA_ROOT = BASE_DIR / 'media'
 
 # Local currency symbol (can be $ € £ ₦ etc.)
 LOCAL_CURRENCY_SYMBOL = 'GH₵'  # Ghana Cedis
-

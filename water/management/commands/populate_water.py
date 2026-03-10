@@ -5,15 +5,15 @@ import random
 import uuid
 
 from water.models import (
-    Site, Apartment, Meter, Sensor, Reading, Alert, ConsumptionSummary,
-    Tariff, Bill, Payment, Maintenance, DeviceHealth, Notification
+    Site, Apartment, Meter, ConsumptionSummary, Bill,
+    Payment, BillOccupancy
 )
 from django.contrib.auth import get_user_model
 
 faker = Faker()
 
 
-def create_users(num_superusers=1, num_block_admins=5, num_residents=15):
+def create_users(num_superusers=1, num_block_admins=1, num_residents=2):
     """Create users with different roles."""
     User = get_user_model()
     users = {'superuser': [], 'block_admin': [], 'user': []}
@@ -79,15 +79,23 @@ def create_sites(block_admin_users, n=5):
     return sites
 
 
-def create_apartments(sites, per_site=4):
+def create_apartments(sites, residents, per_site=4):
     """Create apartments within each site."""
     apartments = []
+    resident_idx = 0
+
     for site in sites:
         for unit_num in range(1, per_site + 1):
+            resident = None
+            if residents:
+                resident = residents[resident_idx % len(residents)]
+                resident_idx += 1
+
             apartment = Apartment.objects.create(
                 site=site,
                 number=f'{unit_num:02d}',
                 occupants=random.randint(1, 6),
+                user=resident,
             )
             apartments.append(apartment)
     return apartments
@@ -110,55 +118,6 @@ def create_meters(sites, apartments, per_site=1):
         meters.append(meter)
         meter_counter += 1
     return meters
-
-
-def create_sensors(meters, per_meter=2):
-    sensors = []
-    types = [t.value for t in Sensor.SensorType]
-    for meter in meters:
-        for _ in range(per_meter):
-            sensor = Sensor.objects.create(
-                meter=meter,
-                sensor_type=random.choice(types),
-                unit=random.choice(['m3/h', 'L/s', 'ppm', '%']),
-                installed_at=faker.date_time_between(start_date=meter.installed_at, end_date='now', tzinfo=timezone.get_current_timezone()),
-            )
-            sensors.append(sensor)
-    return sensors
-
-
-def create_readings(sensors, count=1000):
-    readings = []
-    for sensor in sensors:
-        for _ in range(count):
-            ts = faker.date_time_between(start_date='-1y', end_date='now', tzinfo=timezone.get_current_timezone())
-            readings.append(
-                Reading(
-                    sensor=sensor,
-                    meter=sensor.meter,
-                    timestamp=ts,
-                    value=round(random.uniform(0, 100), 6),
-                    quality=random.choice(['ok','suspect']),
-                )
-            )
-    Reading.objects.bulk_create(readings)
-
-
-def create_alerts(sites, count=20):
-    alerts = []
-    for _ in range(count):
-        site = random.choice(sites)
-        a = Alert.objects.create(
-            site=site,
-            alert_type=random.choice(['leak','outage','high_flow','low_flow','sensor_error']),
-            severity=random.choice(['low','medium','high','critical']),
-            message=faker.sentence(),
-            first_seen=faker.date_time_between(start_date='-1y', end_date='now', tzinfo=timezone.get_current_timezone()),
-            last_seen=timezone.now(),
-            status=random.choice(['open','ack','closed']),
-        )
-        alerts.append(a)
-    return alerts
 
 
 def create_summaries(meters):
@@ -213,7 +172,12 @@ def create_bills(users_dict, sites, apartments, count=30):
                                 period_end=end,
                                 amount_due=round(apartment_share, 2),
                                 status=random.choice(['pending', 'paid', 'overdue']),
-                                due_at=timezone.now() + timezone.timedelta(days=30),
+                                due_at=end + timezone.timedelta(days=30),
+                            )
+                            BillOccupancy.objects.create(
+                                bill=apartment_bill,
+                                apartment=apartment,
+                                occupants=apartment.occupants
                             )
                             bills.append(apartment_bill)
                 else:
@@ -226,7 +190,7 @@ def create_bills(users_dict, sites, apartments, count=30):
                         period_end=end,
                         amount_due=total_block_amount,
                         status=random.choice(['pending', 'paid', 'overdue']),
-                        due_at=timezone.now() + timezone.timedelta(days=30),
+                        due_at=end + timezone.timedelta(days=30),
                     )
                     bills.append(bill)
     
@@ -245,40 +209,6 @@ def create_payments(bills):
             )
 
 
-def create_maintenance(meters, count=20):
-    for _ in range(count):
-        meter = random.choice(meters)
-        Maintenance.objects.create(
-            meter=meter,
-            site=meter.site,
-            scheduled_at=faker.date_time_between(start_date='-1y', end_date='now', tzinfo=timezone.get_current_timezone()),
-            completed_at=timezone.now(),
-            notes=faker.sentence(),
-            performed_by=None,
-        )
-
-
-def create_health(meters):
-    for meter in meters:
-        DeviceHealth.objects.create(
-            meter=meter,
-            last_seen=timezone.now(),
-            status=random.choice(['online','offline','degraded']),
-        )
-
-
-def create_notifications(users_dict, count=50):
-    """Create notifications for all users."""
-    all_users = users_dict['superuser'] + users_dict['block_admin'] + users_dict['user']
-    for _ in range(count):
-        user = random.choice(all_users)
-        Notification.objects.create(
-            user=user,
-            title=faker.sentence(nb_words=6),
-            body=faker.paragraph(),
-        )
-
-
 class Command(BaseCommand):
     help = 'Populate water app with fake data'
     
@@ -292,15 +222,9 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         if options['clear']:
             self.stdout.write('Clearing existing data...')
-            Reading.objects.all().delete()
             ConsumptionSummary.objects.all().delete()
-            Notification.objects.all().delete()
-            DeviceHealth.objects.all().delete()
-            Maintenance.objects.all().delete()
             Payment.objects.all().delete()
             Bill.objects.all().delete()
-            Alert.objects.all().delete()
-            Sensor.objects.all().delete()
             Meter.objects.all().delete()
             Apartment.objects.all().delete()
             Site.objects.all().delete()
@@ -309,32 +233,20 @@ class Command(BaseCommand):
             self.stdout.write('  ✓ All data cleared')
         
         self.stdout.write('Creating users...')
-        users_dict = create_users(num_superusers=1, num_block_admins=5, num_residents=20)
-        self.stdout.write(f'  ✓ Created 1 superuser, 5 block admins, 20 residents')
+        users_dict = create_users(num_superusers=1, num_block_admins=1, num_residents=1)
+        self.stdout.write(f'  ✓ Created 1 superuser, 1 block admin, and 1 resident')
         
         self.stdout.write('Creating sites (blocks)...')
-        sites = create_sites(users_dict['block_admin'], n=5)
-        self.stdout.write(f'  ✓ Created {len(sites)} sites linked to block admins')
+        sites = create_sites(users_dict['block_admin'], n=1)
+        self.stdout.write(f'  ✓ Created {len(sites)} site linked to the block admin')
         
         self.stdout.write('Creating apartments...')
-        apartments = create_apartments(sites, per_site=4)
+        apartments = create_apartments(sites, users_dict['user'], per_site=4)
         self.stdout.write(f'  ✓ Created {len(apartments)} apartments')
         
         self.stdout.write('Creating meters...')
         meters = create_meters(sites, apartments, per_site=1)
         self.stdout.write(f'  ✓ Created {len(meters)} meters (one per site)')
-        
-        self.stdout.write('Creating sensors...')
-        sensors = create_sensors(meters, per_meter=2)
-        self.stdout.write(f'  ✓ Created {len(sensors)} sensors')
-        
-        self.stdout.write('Creating readings... (this may take a while)')
-        create_readings(sensors, count=500)
-        self.stdout.write(f'  ✓ Created readings for all sensors')
-        
-        self.stdout.write('Creating alerts...')
-        create_alerts(sites, count=30)
-        self.stdout.write(f'  ✓ Created 30 alerts')
         
         self.stdout.write('Creating consumption summaries...')
         create_summaries(meters)
@@ -347,17 +259,5 @@ class Command(BaseCommand):
         self.stdout.write('Creating payments...')
         create_payments(bills)
         self.stdout.write(f'  ✓ Created payments for paid bills')
-        
-        self.stdout.write('Creating maintenance events...')
-        create_maintenance(meters, count=30)
-        self.stdout.write(f'  ✓ Created 30 maintenance events')
-        
-        self.stdout.write('Creating device health records...')
-        create_health(meters)
-        self.stdout.write(f'  ✓ Created health records for all meters')
-        
-        self.stdout.write('Creating notifications...')
-        create_notifications(users_dict, count=50)
-        self.stdout.write(f'  ✓ Created 50 notifications')
         
         self.stdout.write(self.style.SUCCESS('✓ Water app fake data population complete!'))

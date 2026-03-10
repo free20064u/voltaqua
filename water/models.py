@@ -41,6 +41,13 @@ class Apartment(models.Model):
     site = models.ForeignKey(Site, on_delete=models.CASCADE, related_name='apartments')
     number = models.CharField(max_length=50)
     occupants = models.PositiveIntegerField(default=0)
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='residences',
+    )
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
@@ -73,77 +80,6 @@ class Meter(models.Model):
         return f"{self.serial_number} @ {self.site.code}"
 
 
-class Sensor(models.Model):
-    class SensorType(models.TextChoices):
-        FLOW = 'flow', 'Flow'
-        LEVEL = 'level', 'Level'
-        PH = 'ph', 'pH'
-        TURBIDITY = 'turbidity', 'Turbidity'
-        TEMPERATURE = 'temperature', 'Temperature'
-        OTHER = 'other', 'Other'
-
-    meter = models.ForeignKey(Meter, on_delete=models.CASCADE, related_name='sensors')
-    sensor_type = models.CharField(max_length=50, choices=SensorType.choices, default=SensorType.OTHER)
-    unit = models.CharField(max_length=20, blank=True)
-    channel = models.CharField(max_length=50, blank=True)
-    installed_at = models.DateTimeField(null=True, blank=True)
-    metadata = models.JSONField(default=dict, blank=True)
-
-    def __str__(self):
-        return f"{self.sensor_type} ({self.id}) on {self.meter.serial_number}"
-
-
-class Reading(models.Model):
-    QUALITY_CHOICES = [
-        ('ok', 'OK'),
-        ('suspect', 'Suspect'),
-        ('error', 'Error'),
-    ]
-
-    sensor = models.ForeignKey(Sensor, on_delete=models.CASCADE, related_name='readings')
-    meter = models.ForeignKey(Meter, on_delete=models.CASCADE, related_name='readings')
-    timestamp = models.DateTimeField(db_index=True)
-    value = models.DecimalField(max_digits=20, decimal_places=6)
-    quality = models.CharField(max_length=20, choices=QUALITY_CHOICES, default='ok')
-    raw_payload = models.JSONField(null=True, blank=True)
-    created_at = models.DateTimeField(auto_now_add=True)
-
-    class Meta:
-        indexes = [
-            models.Index(fields=['sensor', 'timestamp']),
-            models.Index(fields=['meter', 'timestamp']),
-        ]
-        ordering = ['-timestamp']
-
-    def __str__(self):
-        return f"Reading {self.value} {self.sensor.unit} @ {self.timestamp.isoformat()}"
-
-
-class Alert(models.Model):
-    STATUS_CHOICES = [
-        ('open', 'Open'),
-        ('ack', 'Acknowledged'),
-        ('closed', 'Closed'),
-    ]
-
-    site = models.ForeignKey(Site, on_delete=models.CASCADE, related_name='alerts', null=True, blank=True)
-    meter = models.ForeignKey(Meter, on_delete=models.CASCADE, related_name='alerts', null=True, blank=True)
-    sensor = models.ForeignKey(Sensor, on_delete=models.CASCADE, related_name='alerts', null=True, blank=True)
-    alert_type = models.CharField(max_length=100)
-    severity = models.CharField(max_length=20)
-    message = models.TextField(blank=True)
-    first_seen = models.DateTimeField()
-    last_seen = models.DateTimeField()
-    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='open')
-    metadata = models.JSONField(default=dict, blank=True)
-
-    class Meta:
-        indexes = [models.Index(fields=['site', 'status']), models.Index(fields=['severity', 'first_seen'])]
-
-    def __str__(self):
-        return f"{self.alert_type} [{self.severity}] - {self.status}"
-
-
 class ConsumptionSummary(models.Model):
     PERIOD_CHOICES = [
         ('day', 'Day'),
@@ -165,16 +101,6 @@ class ConsumptionSummary(models.Model):
 
     def __str__(self):
         return f"Summary {self.meter.serial_number} {self.period_type} {self.period_date}"
-
-
-class Tariff(models.Model):
-    name = models.CharField(max_length=200)
-    effective_from = models.DateField()
-    effective_to = models.DateField(null=True, blank=True)
-    rate_json = models.JSONField(default=dict, blank=True)
-
-    def __str__(self):
-        return self.name
 
 
 class Bill(models.Model):
@@ -232,36 +158,3 @@ class Payment(models.Model):
 
     def __str__(self):
         return f"Payment {self.amount} for bill {self.bill_id}"
-
-
-class Maintenance(models.Model):
-    meter = models.ForeignKey(Meter, on_delete=models.CASCADE, related_name='maintenance_events')
-    site = models.ForeignKey(Site, on_delete=models.CASCADE, related_name='maintenance_events')
-    scheduled_at = models.DateTimeField()
-    completed_at = models.DateTimeField(null=True, blank=True)
-    notes = models.TextField(blank=True)
-    performed_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True)
-
-    def __str__(self):
-        return f"Maintenance {self.meter.serial_number} @ {self.scheduled_at.date()}"
-
-
-class DeviceHealth(models.Model):
-    meter = models.OneToOneField(Meter, on_delete=models.CASCADE, related_name='health')
-    last_seen = models.DateTimeField(null=True, blank=True)
-    status = models.CharField(max_length=50, default='unknown')
-    details = models.JSONField(default=dict, blank=True)
-
-    def __str__(self):
-        return f"Health {self.meter.serial_number}: {self.status}"
-
-
-class Notification(models.Model):
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='notifications')
-    title = models.CharField(max_length=200)
-    body = models.TextField()
-    created_at = models.DateTimeField(auto_now_add=True)
-    read = models.BooleanField(default=False)
-
-    def __str__(self):
-        return f"Notification to {self.user_id}: {self.title}"

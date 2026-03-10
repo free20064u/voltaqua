@@ -1,5 +1,5 @@
 from django import forms
-from .models import Apartment, Bill
+from .models import Apartment, Bill, Payment
 from django.utils import timezone
 from datetime import timedelta
 
@@ -9,7 +9,7 @@ class ApartmentForm(forms.ModelForm):
     
     class Meta:
         model = Apartment
-        fields = ['number', 'occupants']
+        fields = ['number', 'occupants', 'user']
         widgets = {
             'number': forms.TextInput(attrs={
                 'class': 'form-control',
@@ -21,11 +21,20 @@ class ApartmentForm(forms.ModelForm):
                 'placeholder': 'Number of people living in this apartment',
                 'min': '0',
             }),
+            'user': forms.Select(attrs={
+                'class': 'form-select',
+            }),
         }
     
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields['number'].disabled = True
+        
+        from django.contrib.auth import get_user_model
+        User = get_user_model()
+        self.fields['user'].queryset = User.objects.filter(role='user')
+        self.fields['user'].label = "Assigned Resident"
+        self.fields['user'].required = True
 
 
 class BillEntryForm(forms.Form):
@@ -123,3 +132,19 @@ class BillDistributionForm(forms.Form):
         }),
         label='I confirm that the bill has been correctly distributed to all apartments based on occupancy.',
     )
+
+
+class PaymentForm(forms.ModelForm):
+    """Form for recording a payment against a bill."""
+    class Meta:
+        model = Payment
+        fields = ['amount', 'method', 'reference']
+        widgets = {
+            'amount': forms.NumberInput(attrs={'class': 'form-control', 'step': '0.01'}),
+            'method': forms.Select(choices=[
+                ('cash', 'Cash'),
+                ('mobile_money', 'Mobile Money'),
+                ('bank_transfer', 'Bank Transfer'),
+            ], attrs={'class': 'form-select'}),
+            'reference': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Transaction ID / Reference (Optional)'}),
+        }

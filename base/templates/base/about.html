@@ -1,73 +1,30 @@
 {% extends 'base/base.html' %}
 {% load static %}
 
+{% block extra_head %}
+    <link rel="stylesheet" href="{% static 'css/site.css' %}">
+{% endblock %}
+
 {% block content %}
-    <div class="container py-5">
-        <section class="mb-5">
+    <header class="hero py-5 mb-5 rounded-3 text-center">
+        <div class="py-5 px-4">
+            <img src="{% static 'img/small/voltaqua.png' %}" alt="Voltaqua" class="img-fluid mb-4" style="max-height: 80px;">
             <h1 class="display-4 fw-bold mb-3">About Voltaqua</h1>
-            <p class="lead text-muted">Voltaqua is a comprehensive platform designed to simplify utility bill distribution, monitoring, and management for residential communities.</p>
-        </section>
+            <p class="lead mb-4">Simplifying utility management for communities.</p>
+        </div>
+    </header>
 
-        <section class="mb-5">
-            <h2 class="h3 fw-semibold mb-3">Our Mission</h2>
-            <p>We believe that managing utilities should be transparent, fair, and efficient. Voltaqua empowers community administrators and residents by providing tools to track consumption, distribute bills equitably, and maintain clear communication about service status.</p>
-        </section>
-
-        <section class="mb-5">
-            <h2 class="h3 fw-semibold mb-3">What We Do</h2>
-            <div class="row g-4">
-                <div class="col-md-6">
-                    <div class="card h-100 border-0 shadow-sm">
-                        <div class="card-body">
-                            <h5 class="card-title">💧 Water Distribution</h5>
-                            <p class="card-text">Monitor water consumption per household, calculate fair distribution, and manage billing with transparency and accuracy.</p>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-6">
-                    <div class="card h-100 border-0 shadow-sm">
-                        <div class="card-body">
-                            <h5 class="card-title">⚡ Electric Distribution</h5>
-                            <p class="card-text">Track electricity usage across apartments and residents, ensure accurate metering, and streamline payment collection.</p>
-                        </div>
-                    </div>
-                </div>
+    <section class="mb-5">
+        <h2 class="h3 fw-semibold text-center mb-4">Our Mission</h2>
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <p class="text-muted fs-5">At Voltaqua, our mission is to provide transparent, fair, and efficient utility management solutions for both water and electricity. We believe that technology can bridge the gap between utility providers and consumers, fostering trust and simplifying complex processes like distribution, monitoring, and billing.</p>
+                <p class="text-muted fs-5">Our platform is built with communities in mind, empowering property managers and residents with real-time data, automated billing, and clear communication channels. We are committed to sustainability and responsible resource management, helping create smarter and more efficient living environments.</p>
             </div>
-        </section>
+        </div>
+    </section>
 
-        <section class="mb-5">
-            <h2 class="h3 fw-semibold mb-3">How It Works</h2>
-            <div class="row g-4">
-                <div class="col-md-4 text-center">
-                    <div class="bg-light p-4 rounded mb-3">
-                        <h5 class="mb-2">1. Register</h5>
-                    </div>
-                    <p class="text-muted">Administrators register households and residents on the platform.</p>
-                </div>
-                <div class="col-md-4 text-center">
-                    <div class="bg-light p-4 rounded mb-3">
-                        <h5 class="mb-2">2. Monitor</h5>
-                    </div>
-                    <p class="text-muted">Track real-time consumption and generate automated reports.</p>
-                </div>
-                <div class="col-md-4 text-center">
-                    <div class="bg-light p-4 rounded mb-3">
-                        <h5 class="mb-2">3. Bill & Collect</h5>
-                    </div>
-                    <p class="text-muted">Calculate fair bills and manage payments transparently.</p>
-                </div>
-            </div>
-        </section>
-
-        <section>
-            <h2 class="h3 fw-semibold mb-3">Why Choose Voltaqua?</h2>
-            <ul class="list-group list-group-flush">
-                <li class="list-group-item"><strong>Transparency:</strong> Real-time visibility into consumption and billing</li>
-                <li class="list-group-item"><strong>Accuracy:</strong> Automated calculations reduce disputes and errors</li>
-                <li class="list-group-item"><strong>Efficiency:</strong> Streamlined billing and payment management</li>
-                <li class="list-group-item"><strong>Communication:</strong> Notify residents about service updates and maintenance</li>
-                <li class="list-group-item"><strong>Scalability:</strong> Works for small compounds to large apartment complexes</li>
-            </ul>
-        </section>
-    </div>
+    <section class="text-center">
+        <a href="{% url 'base:home' %}" class="btn btn-primary btn-lg">Back to Home</a>
+    </section>
 {% endblock %}

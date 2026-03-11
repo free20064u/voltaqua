@@ -2,14 +2,7 @@
 {% load static %}
 
 {% block extra_head %}
-        <style>
-            .hero {
-                background: linear-gradient(135deg, #E6F7FF 0%, #FFFFFF 100%);
-            }
-            .feature-icon {
-                font-size: 1.6rem;
-            }
-        </style>
+    <link rel="stylesheet" href="{% static 'css/site.css' %}">
 {% endblock %}
 
 {% block content %}
@@ -18,15 +11,15 @@
                 <div class="row align-items-center">
                     <div class="col-lg-6 text-center text-lg-start">
                         <h1 class="display-4 fw-bold mb-3">Manage Utilities with Confidence</h1>
-                        <p class="lead text-muted mb-4">Voltaqua makes distribution, monitoring, and billing for water and electric simple, transparent, and fair.</p>
+                        <p class="lead mb-4">Voltaqua makes distribution, monitoring, and billing for water and electric simple, transparent, and fair.</p>
                         <div class="d-flex gap-2 flex-wrap justify-content-center justify-content-lg-start">
                             <a href="{% url 'water:dashboard' %}" class="btn btn-primary btn-lg">Water Services</a>
-                            <a href="{% url 'electric:electric' %}" class="btn btn-outline-primary btn-lg">Electric Services</a>
-                            <a href="{% url 'base:about' %}" class="btn btn-link text-decoration-none align-self-center">Learn more</a>
+                            <a href="{% url 'electric:electric' %}" class="btn btn-outline-light btn-lg">Electric Services</a>
+                            <a href="{% url 'base:about' %}" class="btn btn-link text-white text-decoration-none align-self-center">Learn more</a>
                         </div>
                     </div>
                     <div class="col-lg-6 mt-4 mt-lg-0 text-center">
-                        <img src="{% static 'img/hero-illustration.png' %}" alt="hero" class="img-fluid" style="max-width:420px; filter: drop-shadow(0 8px 24px rgba(0,0,0,0.08));">
+                        <img src="{% static 'img/small/voltaqua.png' %}" alt="hero" class="img-fluid" style="max-width:420px; filter: drop-shadow(0 8px 24px rgba(0,0,0,0.08));">
                     </div>
                 </div>
             </div>

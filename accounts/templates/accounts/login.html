@@ -1,22 +1,20 @@
 {% extends 'base/base.html' %}
 {% load static %}
 
+{% block extra_head %}
+    <link rel="stylesheet" href="{% static 'css/auth_pages.css' %}">
+{% endblock %}
+
 {% block content %}
-    <div class="row justify-content-center">
-        <div class="row justify-content-center">
+    <div class="row justify-content-center align-items-center" style="min-height: 80vh;">
             <div class="col-md-5">
                 <div class="card shadow-lg border-0">
                     <div class="card-body p-5">
-                        <h2 class="card-title text-center mb-4">Log In to Voltaqua</h2>
-                        
-                        {% if messages %}
-                            <div class="alert alert-info alert-dismissible fade show" role="alert">
-                                {% for message in messages %}
-                                    {{ message }}
-                                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                                {% endfor %}
-                            </div>
-                        {% endif %}
+                        <div class="text-center mb-4">
+                            <img src="{% static 'img/small/voltaqua.png' %}" alt="Voltaqua" class="img-fluid mb-3" style="max-height: 60px;">
+                            <h2 class="card-title fw-bold">Welcome Back</h2>
+                            <p class="text-muted">Log in to manage your utilities</p>
+                        </div>
 
                         {% if form.non_field_errors %}
                             <div class="alert alert-danger alert-dismissible fade show" role="alert">
@@ -46,6 +44,10 @@
                                 {% endif %}
                             </div>
 
+                            <div class="text-end mb-3">
+                                <a href="{% url 'accounts:password_reset' %}">Forgot password?</a>
+                            </div>
+
                             <button type="submit" class="btn btn-primary w-100 mb-3">Log In</button>
                         </form>
 
@@ -55,6 +57,5 @@
                     </div>
                 </div>
             </div>
-        </div>
     </div>
 {% endblock %}

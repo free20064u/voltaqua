@@ -31,9 +31,9 @@
               <tr>
                 <td>{{ bill.period_start|date:"M d" }} - {{ bill.period_end|date:"M d, Y" }}</td>
                 <td>{{ bill.issued_at|date:"M d, Y" }}</td>
-                <td>{{ bill.currency }} {{ bill.amount_due }}</td>
-                <td>{{ bill.currency }} {{ bill.total_paid }}</td>
-                <td><strong>{{ bill.currency }} {{ bill.balance }}</strong></td>
+                <td>{{ bill.currency }} {{ bill.amount_due|floatformat:2 }}</td>
+                <td>{{ bill.currency }} {{ bill.total_paid|floatformat:2 }}</td>
+                <td><strong>{{ bill.currency }} {{ bill.balance|floatformat:2 }}</strong></td>
                 <td>
                   {% if bill.status == 'paid' %}
                     <span class="badge bg-success">Paid</span>

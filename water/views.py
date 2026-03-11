@@ -4,6 +4,7 @@ from django.db.models import Sum
 from django.utils import timezone
 from django.http import Http404
 from django.contrib.auth.decorators import login_required
+from decimal import Decimal, ROUND_HALF_UP
 from django.contrib import messages
 from datetime import timedelta
 from django.db.models.functions import Coalesce
@@ -95,21 +96,23 @@ def _gather_stats(site=None, apartment=None):
     outstanding_bills_qs = qs_bills.filter(status__in=['pending', 'overdue'])
     outstanding_bills_count = outstanding_bills_qs.count()
     outstanding_bills_consumption = outstanding_bills_qs.aggregate(Sum('volume_consumed')).get('volume_consumed__sum') or 0
-
-    total_due = qs_bills.aggregate(Sum('amount_due')).get('amount_due__sum') or 0
-    total_paid = qs_payments.aggregate(Sum('amount')).get('amount__sum') or 0
+    
+    total_due = qs_bills.aggregate(Sum('amount_due')).get('amount_due__sum') or Decimal('0')
+    total_paid = qs_payments.aggregate(Sum('amount')).get('amount__sum') or Decimal('0')
     outstanding_bills_amount = total_due - total_paid
     collection_rate = int((total_paid * 100) / total_due) if total_due else 0
+
+    two_places = Decimal('0.01')
 
     return {
         'total_consumption_m3': float(round(total_vol, 2)),
         'total_consumption_all_time': float(round(total_vol_all, 2)),
         'active_meters': active_meters,
-        'outstanding_bills': float(round(outstanding_bills_amount, 2)),
+        'outstanding_bills': outstanding_bills_amount.quantize(two_places, rounding=ROUND_HALF_UP),
         'outstanding_bills_count': outstanding_bills_count,
         'collection_rate': int(collection_rate),
-        'total_due': float(round(total_due, 2)),
-        'total_paid': float(round(total_paid, 2)),
+        'total_due': total_due.quantize(two_places, rounding=ROUND_HALF_UP),
+        'total_paid': total_paid.quantize(two_places, rounding=ROUND_HALF_UP),
         'outstanding_bills_consumption': float(round(outstanding_bills_consumption, 2)),
     }
 
@@ -473,8 +476,8 @@ def enter_bill(request, site_id):
                     created_bills = []
                     for apartment in apartments:
                         occ = occupancies.get(apartment.id, apartment.occupants)
-                        apartment_share = (occ / total_occupants) * float(total_amount)
-                        volume_share = (occ / total_occupants) * float(total_volume) if total_volume else 0
+                        apartment_share = (Decimal(occ) / Decimal(total_occupants)) * total_amount
+                        volume_share = (Decimal(occ) / Decimal(total_occupants)) * total_volume if total_volume else 0
 
                         bill = Bill.objects.create(
                             user=request.user,

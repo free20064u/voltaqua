@@ -2,6 +2,7 @@ from django import forms
 from django.contrib.auth.forms import ReadOnlyPasswordHashField
 from django.contrib.auth.forms import AuthenticationForm
 from .models import User
+from water.models import Apartment
 
 
 class ProfileForm(forms.ModelForm):
@@ -14,6 +15,8 @@ class ProfileForm(forms.ModelForm):
             'profile_image': forms.ClearableFileInput(attrs={'class': 'form-control'})
         }
 
+
+from water.models import Apartment
 
 class CustomAuthenticationForm(AuthenticationForm):
     username = forms.CharField(
@@ -30,6 +33,19 @@ class CustomAuthenticationForm(AuthenticationForm):
         initial=True,
         widget=forms.CheckboxInput(attrs={'class': 'form-check-input'})
     )
+
+    def clean(self):
+        cleaned_data = super().clean()
+        user = self.user_cache
+        if user is not None and user.role == 'user':
+            try:
+                apartment = Apartment.objects.get(user=user)
+                if not apartment.is_active:
+                    raise forms.ValidationError("Your apartment is not active. Please contact your block administrator.")
+            except Apartment.DoesNotExist:
+                # This should not happen for a 'user' role, but as a safeguard:
+                raise forms.ValidationError("You are not associated with any apartment.")
+        return cleaned_data
 
 
 class UserCreationForm(forms.ModelForm):

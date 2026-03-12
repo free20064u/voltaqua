@@ -48,6 +48,7 @@ class Apartment(models.Model):
         blank=True,
         related_name='residences',
     )
+    is_active = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):

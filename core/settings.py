@@ -155,3 +155,6 @@ MEDIA_ROOT = BASE_DIR / 'media'
 
 # Local currency symbol (can be $ € £ ₦ etc.)
 LOCAL_CURRENCY_SYMBOL = 'GH₵'  # Ghana Cedis
+
+# Email settings for development (prints to console)
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'

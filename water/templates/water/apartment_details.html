@@ -2,13 +2,9 @@
 {% load static %}
 
 {% block content %}
-  <style>
-    .stat-card { min-height:120px }
-    .table-actions a { margin-right: .4rem }
-  </style>
     <div class="d-flex justify-content-between align-items-center mb-4">
       <h1 class="h3 mb-0">{{ entity_name }} — Water Dashboard</h1>
-      <div>
+      <div class="d-flex flex-column flex-sm-row gap-2">
         <a class="btn btn-outline-secondary" href="{% url 'water:apartment-dashboard' apartment.id %}">Refresh</a>
         <a class="btn btn-primary" href="{% url 'water:dashboard' %}">Back to Dashboard</a>
       </div>

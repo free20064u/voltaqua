@@ -1,58 +1,27 @@
 {% load static %}
-<footer class="bg-dark text-white pt-5 pb-4 mt-5">
-    <div class="container text-center text-md-start">
-        <div class="row text-center text-md-start">
-            
-            <!-- Company Name/Logo -->
-            <div class="col-md-3 col-lg-3 col-xl-3 mx-auto mt-3">
-                <h5 class="text-uppercase mb-4 font-weight-bold text-warning">
-                    <img src="{% static 'img/small/voltaqua.png' %}" alt="Voltaqua Logo" height="30" class="d-inline-block align-text-top me-2">
-                    Voltaqua
-                </h5>
-                <p>
-                    Efficient utility distribution and billing management for your community.
-                </p>
-            </div>
-
-            <!-- Links -->
-            <div class="col-md-2 col-lg-2 col-xl-2 mx-auto mt-3">
-                <h5 class="text-uppercase mb-4 font-weight-bold text-warning">Products</h5>
-                <p><a href="#" class="text-white" style="text-decoration: none;">Water</a></p>
-                <p><a href="#" class="text-white" style="text-decoration: none;">Electricity</a></p>
-            </div>
-
-            <!-- Useful links -->
-            <div class="col-md-3 col-lg-2 col-xl-2 mx-auto mt-3">
-                <h5 class="text-uppercase mb-4 font-weight-bold text-warning">Useful links</h5>
-                <p><a href="{% url 'base:home' %}" class="text-white" style="text-decoration: none;">Home</a></p>
-                <p><a href="{% url 'base:about' %}" class="text-white" style="text-decoration: none;">About</a></p>
-                {% if user.is_authenticated %}
-                <p><a href="{% url 'accounts:profile' %}" class="text-white" style="text-decoration: none;">Your Account</a></p>
-                {% else %}
-                <p><a href="{% url 'accounts:login' %}" class="text-white" style="text-decoration: none;">Login</a></p>
-                {% endif %}
-            </div>
-
-            <!-- Contact -->
-            <div class="col-md-4 col-lg-3 col-xl-3 mx-auto mt-3">
-                <h5 class="text-uppercase mb-4 font-weight-bold text-warning">Contact</h5>
-                <p><i class="bi bi-house-door-fill me-3"></i> Accra, Ghana</p>
-                <p><i class="bi bi-envelope-fill me-3"></i> info@voltaqua.com</p>
-                <p><i class="bi bi-phone-fill me-3"></i> + 233 557 861 007</p>
-            </div>
-        </div>
-
-        <hr class="mb-4">
-
+<footer class="footer mt-auto py-3 footer-brand">
+    <div class="container">
         <div class="row align-items-center">
-            <div class="col-md-7 col-lg-8">
-                <p> Copyright © {% now "Y" %} All rights reserved by:
-                    <strong class="text-warning">Voltaqua</strong>
-                </p>
+            <div class="col-md-4 text-center text-md-start mb-2 mb-md-0">
+                <a href="{% url 'base:home' %}">
+                    <img src="{% static 'img/small/voltaqua.png' %}" alt="Voltaqua" height="60">
+                </a>
             </div>
-            <div class="col-md-5 col-lg-4">
-                <div class="text-center text-md-end">
-                    <p class="mb-0">Designed by <span class="text-warning fw-bold">Alphy</span></p>
+            <div class="col-md-4 text-center">
+                <p class="text-white-50 small mb-0">&copy; {% now "Y" %} Voltaqua. All rights reserved.</p>
+                <p class="text-white-50 small mb-0">Designed by Alphy</p>
+            </div>
+            <div class="col-md-4 text-center text-md-end">
+                <div class="mb-2">
+                    <a href="{% url 'base:about' %}" class="text-white-50 text-decoration-none me-3">About</a>
+                    <a href="{% url 'base:contact' %}" class="text-white-50 text-decoration-none me-3">Contact</a>
+                    <a href="{% url 'base:terms' %}" class="text-white-50 text-decoration-none me-3">Terms</a>
+                    <a href="{% url 'base:privacy' %}" class="text-white-50 text-decoration-none">Privacy</a>
+                </div>
+                <div class="footer-social">
+                    <a href="#" class="text-white-50 text-decoration-none me-3 fs-5"><i class="bi bi-twitter"></i></a>
+                    <a href="#" class="text-white-50 text-decoration-none me-3 fs-5"><i class="bi bi-facebook"></i></a>
+                    <a href="#" class="text-white-50 text-decoration-none fs-5"><i class="bi bi-instagram"></i></a>
                 </div>
             </div>
         </div>

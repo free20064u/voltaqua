@@ -1,0 +1,75 @@
+{% extends "base/base.html" %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+<div class="container my-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="m-0">{{ title }}</h1>
+        {% if user.unread_notification_count > 0 %}
+            <form action="{% url 'accounts:mark_notifications_read' %}" method="post">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-sm btn-outline-primary">Mark all as read</button>
+            </form>
+        {% endif %}
+    </div>
+
+    <div class="list-group" id="notification-list">
+        {% for notification in notifications %}
+            <div class="list-group-item list-group-item-action flex-column align-items-start {% if not notification.is_read %}list-group-item-light{% endif %}">
+                <div class="d-flex w-100 justify-content-between">
+                    <p class="mb-1">{{ notification.message }}</p>
+                    <small class="text-muted">{{ notification.timestamp|timesince }} ago</small>
+                </div>
+            </div>
+        {% empty %}
+            <p class="text-center text-muted" id="empty-notification-message">You have no notifications.</p>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const notificationSocket = new WebSocket(
+            'ws://'
+            + window.location.host
+            + '/ws/notifications/'
+        );
+
+        notificationSocket.onmessage = function(e) {
+            const data = JSON.parse(e.data);
+
+            // We expect a message with a 'text' property from the registration event
+            if (data.text) {
+                const notificationList = document.getElementById('notification-list');
+                const emptyMessage = document.getElementById('empty-notification-message');
+
+                // 1. Remove the 'empty' message if it exists
+                if (emptyMessage) {
+                    emptyMessage.remove();
+                }
+
+                // 2. Create the new notification element
+                const newNotification = document.createElement('div');
+                // Add the 'unread' class (list-group-item-light)
+                newNotification.className = 'list-group-item list-group-item-action flex-column align-items-start list-group-item-light';
+                newNotification.innerHTML = `
+                    <div class="d-flex w-100 justify-content-between">
+                        <p class="mb-1">${data.text}</p>
+                        <small class="text-muted">just now</small>
+                    </div>
+                `;
+
+                // 3. Prepend the new notification to the list
+                notificationList.prepend(newNotification);
+            }
+        };
+
+        notificationSocket.onclose = function(e) {
+            console.error('Notification socket closed unexpectedly');
+        };
+    });
+</script>
+{% endblock %}

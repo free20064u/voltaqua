@@ -2,6 +2,7 @@
 {% load static %}
 
 {% block extra_head %}
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.css">
     <link rel="stylesheet" href="{% static 'css/auth_pages.css' %}">
 {% endblock %}
 
@@ -25,17 +26,35 @@
                         </div>
                     {% endif %}
 
-                    <form method="post" novalidate>
+                    <form method="post" enctype="multipart/form-data" novalidate>
                         {% csrf_token %}
                         
+                        <div class="text-center mb-4">
+                            <label for="id_profile_image" style="cursor: pointer;">
+                                <img id="profile-image-preview"
+                                     src="{% static 'img/small/voltaqua.png' %}"
+                                     alt="Profile Preview"
+                                     class="rounded-circle"
+                                     width="150" height="150"
+                                     style="object-fit: cover; border: 3px solid #dee2e6;">
+                            </label>
+                            <p class="text-muted mt-2 small">Click image to change</p>
+                        </div>
+
                         {% for field in form %}
-                            <div class="mb-3">
-                                <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
-                                {{ field }}
-                                {% if field.errors %}
-                                    <div class="invalid-feedback d-block">{{ field.errors }}</div>
-                                {% endif %}
-                            </div>
+                            {% if field.name == 'profile_image' %}
+                                <div class="mb-3" style="display: none;">
+                                    {{ field }}
+                                </div>
+                            {% else %}
+                                <div class="mb-3">
+                                    <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
+                                    {{ field }}
+                                    {% if field.errors %}
+                                        <div class="invalid-feedback d-block">{{ field.errors }}</div>
+                                    {% endif %}
+                                </div>
+                            {% endif %}
                         {% endfor %}
 
                         <button type="submit" class="btn btn-primary w-100 mb-3">Register</button>
@@ -48,4 +67,78 @@
             </div>
         </div>
     </div>
+
+    <!-- Modal for cropping -->
+    <div class="modal fade" id="cropImageModal" tabindex="-1" aria-labelledby="cropImageModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="cropImageModalLabel">Crop Image</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <div class="img-container">
+                <img id="image-to-crop" src="" style="max-width: 100%;">
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+            <button type="button" class="btn btn-primary" id="crop-button">Crop & Save</button>
+          </div>
+        </div>
+      </div>
+    </div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const imageInput = document.getElementById('id_profile_image');
+    const imagePreview = document.getElementById('profile-image-preview');
+    const cropModal = new bootstrap.Modal(document.getElementById('cropImageModal'));
+    const imageToCrop = document.getElementById('image-to-crop');
+    const cropButton = document.getElementById('crop-button');
+    let cropper;
+
+    imageInput.addEventListener('change', function(event) {
+        const file = event.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                imageToCrop.src = e.target.result;
+                cropModal.show();
+            };
+            reader.readAsDataURL(file);
+        }
+    });
+
+    document.getElementById('cropImageModal').addEventListener('shown.bs.modal', function () {
+        cropper = new Cropper(imageToCrop, {
+            aspectRatio: 1,
+            viewMode: 1,
+            background: false,
+        });
+    });
+
+    document.getElementById('cropImageModal').addEventListener('hidden.bs.modal', function () {
+        cropper.destroy();
+        cropper = null;
+        imageInput.value = '';
+    });
+
+    cropButton.addEventListener('click', function() {
+        const canvas = cropper.getCroppedCanvas({ width: 300, height: 300 });
+        imagePreview.src = canvas.toDataURL();
+        canvas.toBlob(function(blob) {
+            const fileName = imageInput.files[0].name;
+            const newFile = new File([blob], fileName, { type: 'image/png', lastModified: Date.now() });
+            const dataTransfer = new DataTransfer();
+            dataTransfer.items.add(newFile);
+            imageInput.files = dataTransfer.files;
+            cropModal.hide();
+        }, 'image/png');
+    });
+});
+</script>
 {% endblock %}

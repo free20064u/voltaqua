@@ -391,8 +391,8 @@ def edit_apartment(request, apartment_id):
     apartment = get_object_or_404(Apartment, pk=apartment_id)
     site = apartment.site
     
-    # Check if user is the block admin for this site
-    if request.user.role != 'block_admin' or site.user_id != request.user.id:
+    # Check if user is the block admin for this site or a superuser
+    if not (request.user.role == 'superuser' or (request.user.role == 'block_admin' and site.user_id == request.user.id)):
         raise Http404
     
     if request.method == 'POST':
@@ -410,7 +410,7 @@ def edit_apartment(request, apartment_id):
         'apartment': apartment,
         'site': site,
     }
-    return render(request, 'wateredit_apartment.html', context)
+    return render(request, 'water/edit_apartment.html', context)
 
 
 @login_required

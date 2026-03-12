@@ -2,17 +2,19 @@ from django.urls import path, reverse_lazy
 from django.contrib.auth import views as auth_views
 
 from . import views
+from .forms import CustomAuthenticationForm
 
 app_name = 'accounts'
 
 urlpatterns = [
     # NOTE: You should move your existing login, logout, and register
     # URL patterns into this file to keep your accounts app self-contained.
-    # For example:
-    path('login/', auth_views.LoginView.as_view(template_name='accounts/login.html'), name='login'),
+    path('login/', views.CustomLoginView.as_view(), name='login'),
     path('register/', views.register, name='register'),
     path('logout/', views.logout_view, name='logout'),
     path('profile/', views.profile, name='profile'),
+    path('notifications/', views.notification_list, name='notification_list'),
+    path('notifications/mark-read/', views.mark_notifications_read, name='mark_notifications_read'),
 
     # Password reset flow
     path('password_reset/',

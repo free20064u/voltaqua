@@ -2,16 +2,11 @@
 {% load static %}
 
 {% block content %}
-  <style>
-    .stat-card { min-height:120px }
-    .table-actions a { margin-right: .4rem }
-    .apartment-card { border-left: 4px solid #0d6efd; }
-  </style>
     <div class="d-flex justify-content-between align-items-center mb-4">
       <h1 class="h3 mb-0">{{ entity_name }} Dashboard (Block Admin)</h1>
-      <div>
-        <a class="btn btn-outline-secondary" href="{% url 'water:dashboard' %}">Refresh</a>
-        <a class="btn btn-primary" href="{% url 'water:block-dashboard' site.id %}">View Full Block</a>
+      <div class="d-flex flex-column flex-sm-row gap-2">
+        <a class="btn btn-outline-secondary" href="{% url 'water:block-dashboard' site.id %}">Refresh</a>
+        <a class="btn btn-primary" href="{% url 'water:dashboard' %}">Back to Dashboard</a>
       </div>
     </div>
 
@@ -120,7 +115,7 @@
                       <dt class="col-sm-6 text-muted small">Unpaid Bills:</dt>
                       <dd class="col-sm-6 text-end small"><strong>{{ item.stats.outstanding_bills }}</strong></dd>
                     </dl>
-                    <div class="d-flex gap-2">
+                    <div class="d-flex flex-column flex-sm-row gap-2">
                       <a href="{% url 'water:apartment-dashboard' item.apartment.id %}" class="btn btn-sm btn-outline-primary flex-grow-1">View</a>
                       {% if request.user.role == 'block_admin' %}
                       <a href="{% url 'water:edit-apartment' item.apartment.id %}" class="btn btn-sm btn-outline-info">Edit Occupants</a>

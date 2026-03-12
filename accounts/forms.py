@@ -24,6 +24,12 @@ class CustomAuthenticationForm(AuthenticationForm):
         label='Password',
         widget=forms.PasswordInput(attrs={'class': 'form-control'})
     )
+    remember_me = forms.BooleanField(
+        label='Remember me',
+        required=False,
+        initial=True,
+        widget=forms.CheckboxInput(attrs={'class': 'form-check-input'})
+    )
 
 
 class UserCreationForm(forms.ModelForm):

@@ -2,10 +2,6 @@
 {% load static %}
 
 {% block content %}
-  <style>
-    .stat-card { min-height:120px }
-    .table-actions a { margin-right: .4rem }
-  </style>
     <div class="d-flex justify-content-between align-items-center mb-4">
       <h1 class="h3 mb-0">{{ entity_name }} Dashboard (Superuser)</h1>
       <div>
@@ -68,7 +64,7 @@
     <div class="row g-3 mb-4">
       <div class="col-6 col-md-3">
         <a href="{% url 'water:sites-list' %}" class="text-decoration-none">
-          <div class="card shadow-sm" style="cursor: pointer; transition: transform 0.2s, box-shadow 0.2s;" onmouseover="this.style.transform='translateY(-5px)'; this.style.boxShadow='0 10px 25px rgba(0,0,0,0.15)'" onmouseout="this.style.transform='none'; this.style.boxShadow='0 0.125rem 0.25rem rgba(0,0,0,0.075)'">
+          <div class="card shadow-sm overview-card">
             <div class="card-body">
               <h6 class="card-title text-muted">Total Blocks</h6>
               <h3 class="fw-bold">{{ total_sites }}</h3>
@@ -78,7 +74,7 @@
       </div>
       <div class="col-6 col-md-3">
         <a href="{% url 'water:apartments-list' %}" class="text-decoration-none">
-          <div class="card shadow-sm" style="cursor: pointer; transition: transform 0.2s, box-shadow 0.2s;" onmouseover="this.style.transform='translateY(-5px)'; this.style.boxShadow='0 10px 25px rgba(0,0,0,0.15)'" onmouseout="this.style.transform='none'; this.style.boxShadow='0 0.125rem 0.25rem rgba(0,0,0,0.075)'">
+          <div class="card shadow-sm overview-card">
             <div class="card-body">
               <h6 class="card-title text-muted">Total Apartments</h6>
               <h3 class="fw-bold">{{ total_apartments }}</h3>
@@ -88,7 +84,7 @@
       </div>
       <div class="col-6 col-md-3">
         <a href="{% url 'water:meters-list' %}" class="text-decoration-none">
-          <div class="card shadow-sm" style="cursor: pointer; transition: transform 0.2s, box-shadow 0.2s;" onmouseover="this.style.transform='translateY(-5px)'; this.style.boxShadow='0 10px 25px rgba(0,0,0,0.15)'" onmouseout="this.style.transform='none'; this.style.boxShadow='0 0.125rem 0.25rem rgba(0,0,0,0.075)'">
+          <div class="card shadow-sm overview-card">
             <div class="card-body">
               <h6 class="card-title text-muted">Total Meters</h6>
               <h3 class="fw-bold">{{ total_meters }}</h3>
@@ -98,7 +94,7 @@
       </div>
       <div class="col-6 col-md-3">
         <a href="{% url 'water:admins-list' %}" class="text-decoration-none">
-          <div class="card shadow-sm" style="cursor: pointer; transition: transform 0.2s, box-shadow 0.2s;" onmouseover="this.style.transform='translateY(-5px)'; this.style.boxShadow='0 10px 25px rgba(0,0,0,0.15)'" onmouseout="this.style.transform='none'; this.style.boxShadow='0 0.125rem 0.25rem rgba(0,0,0,0.075)'">
+          <div class="card shadow-sm overview-card">
             <div class="card-body">
               <h6 class="card-title text-muted">Block Admins</h6>
               <h3 class="fw-bold">{{ total_admins }}</h3>

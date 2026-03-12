@@ -1,0 +1,58 @@
+{% load static %}
+<nav class="navbar navbar-expand-lg navbar-dark navbar-brand-bg shadow-sm">
+    <div class="container">
+        <a class="navbar-brand" href="{% url 'base:home' %}">
+            <img src="{% static 'img/small/voltaqua.png' %}" alt="Voltaqua" height="30" class="d-inline-block align-text-top">
+            Voltaqua
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ms-auto align-items-center">
+                <li id="notification-bell" class="nav-item me-2 text-light"></li>
+                <li class="nav-item">
+                    <a class="nav-link {% if request.resolver_match.view_name == 'base:home' %}active{% endif %}" {% if request.resolver_match.view_name == 'base:home' %}aria-current="page"{% endif %} href="{% url 'base:home' %}">Home</a>
+                </li>
+                {% if user.is_authenticated %}
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.resolver_match.app_name == 'water' %}active{% endif %}" {% if request.resolver_match.app_name == 'water' %}aria-current="page"{% endif %} href="{% url 'water:dashboard' %}">Water</a>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="navbarUserDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            {% if user.profile_image %}
+                                <div class="position-relative me-2">
+                                    <img src="{{ user.profile_image.url }}" alt="Profile" class="rounded-circle" width="24" height="24" style="object-fit: cover;">
+                                    {% if user.unread_notification_count > 0 %}
+                                        <span class="position-absolute top-0 start-100 translate-middle p-1 bg-danger border border-light rounded-circle">
+                                            <span class="visually-hidden">New alerts</span>
+                                        </span>
+                                    {% endif %}
+                                </div>
+                            {% endif %}
+                            {{ user.first_name|default:user.email }}
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarUserDropdown">
+                            <li><a class="dropdown-item {% if request.resolver_match.view_name == 'accounts:profile' %}active{% endif %}" href="{% url 'accounts:profile' %}">Profile</a></li>
+                            <li>
+                                <a class="dropdown-item d-flex justify-content-between align-items-center {% if request.resolver_match.view_name == 'accounts:notification_list' %}active{% endif %}" href="{% url 'accounts:notification_list' %}">
+                                    Notifications
+                                    {% if user.unread_notification_count > 0 %}<span class="badge bg-danger rounded-pill">{{ user.unread_notification_count }}</span>{% endif %}
+                                </a>
+                            </li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="{% url 'accounts:logout' %}">Logout</a></li>
+                        </ul>
+                    </li>
+                {% else %}
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.resolver_match.view_name == 'accounts:login' %}active{% endif %}" href="{% url 'accounts:login' %}">Login</a>
+                    </li>
+                    <li class="nav-item ms-lg-2">
+                        <a class="btn btn-outline-light {% if request.resolver_match.view_name == 'accounts:register' %}active{% endif %}" href="{% url 'accounts:register' %}">Register</a>
+                    </li>
+                {% endif %}
+            </ul>
+        </div>
+    </div>
+</nav>

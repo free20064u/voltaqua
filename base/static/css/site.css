@@ -18,3 +18,42 @@
     align-items: center;
     justify-content: center;
 }
+
+.stat-card {
+    min-height: 120px;
+}
+
+.table-actions a {
+    margin-right: .4rem;
+}
+
+.apartment-card {
+    border-left: 4px solid #0d6efd;
+}
+
+.overview-card {
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.overview-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 25px rgba(0,0,0,0.15) !important;
+}
+
+.footer-brand {
+    background-color: #001f3f; /* Dark blue from gradient */
+    color: white;
+}
+
+.navbar-brand-bg {
+    background-color: #001f3f; /* Dark blue from gradient */
+}
+
+.footer-social a {
+    transition: color 0.2s ease-in-out;
+}
+
+.footer-social a:hover {
+    color: #ffffff !important;
+}

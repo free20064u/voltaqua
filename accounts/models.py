@@ -1,3 +1,4 @@
+from PIL import Image
 from django.db import models
 from django.contrib.auth.models import (
 	AbstractBaseUser, PermissionsMixin, BaseUserManager
@@ -51,3 +52,40 @@ class User(AbstractBaseUser, PermissionsMixin):
 
 	def __str__(self):
 		return self.email
+
+	def save(self, *args, **kwargs):
+		# Delete old image if a new one is uploaded
+		if self.pk:
+			try:
+				old_profile = User.objects.get(pk=self.pk)
+				if old_profile.profile_image and old_profile.profile_image != self.profile_image:
+					old_profile.profile_image.delete(save=False)
+			except User.DoesNotExist:
+				pass
+
+		super().save(*args, **kwargs)
+
+		if self.profile_image:
+			img = Image.open(self.profile_image.path)
+
+			if img.height > 300 or img.width > 300:
+				output_size = (300, 300)
+				img.thumbnail(output_size)
+				img.save(self.profile_image.path)
+
+	@property
+	def unread_notification_count(self):
+		return self.notifications.filter(is_read=False).count()
+
+
+class Notification(models.Model):
+    recipient = models.ForeignKey(User, on_delete=models.CASCADE, related_name='notifications')
+    message = models.TextField()
+    is_read = models.BooleanField(default=False)
+    timestamp = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Notification for {self.recipient.email}"
+
+    class Meta:
+        ordering = ['-timestamp']

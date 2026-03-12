@@ -1,0 +1,26 @@
+{% extends 'base/base.html' %}
+{% load static %}
+
+{% block title %}Page Not Found - Voltaqua{% endblock %}
+
+{% block extra_head %}
+    <link rel="stylesheet" href="{% static 'css/auth_pages.css' %}">
+{% endblock %}
+
+{% block content %}
+    <div class="row justify-content-center align-items-center" style="min-height: 80vh;">
+        <div class="col-md-6">
+            <div class="card shadow-lg border-0">
+                <div class="card-body p-5 text-center">
+                    <img src="{% static 'img/small/voltaqua.png' %}" alt="Voltaqua" class="img-fluid mb-4" style="max-height: 60px;">
+                    <h1 class="display-1 fw-bold text-primary">404</h1>
+                    <h2 class="card-title fw-bold mb-3">Page Not Found</h2>
+                    <p class="text-muted">Sorry, the page you are looking for does not exist or has been moved.</p>
+                    <a href="{% url 'base:home' %}" class="btn btn-primary mt-4">
+                        <i class="bi bi-house-door me-2"></i>Return to Home
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

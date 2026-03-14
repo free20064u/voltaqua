@@ -8,11 +8,12 @@ from water.models import Apartment
 class ProfileForm(forms.ModelForm):
     class Meta:
         model = User
-        fields = ('first_name', 'last_name', 'profile_image')
+        fields = ('first_name', 'last_name', 'profile_image', 'receive_email_notifications')
         widgets = {
             'first_name': forms.TextInput(attrs={'class': 'form-control'}),
             'last_name': forms.TextInput(attrs={'class': 'form-control'}),
-            'profile_image': forms.ClearableFileInput(attrs={'class': 'form-control'})
+            'profile_image': forms.ClearableFileInput(attrs={'class': 'form-control'}),
+            'receive_email_notifications': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
         }
 
 
@@ -55,9 +56,17 @@ class UserCreationForm(forms.ModelForm):
     )
     role = forms.ChoiceField(
         choices=ROLE_CHOICES,
-        widget=forms.RadioSelect,
+        widget=forms.RadioSelect(attrs={'class': 'form-check-input'}),
         required=True,
         label="I am a..."
+    )
+    
+    agreement = forms.ChoiceField(
+        choices=[('agree', 'I agree')],
+        widget=forms.RadioSelect(attrs={'class': 'form-check-input'}),
+        required=True,
+        label="Legal Agreement",
+        error_messages={'required': 'You must agree to the terms and privacy policy to register.'}
     )
 
     class Meta:

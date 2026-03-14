@@ -1,22 +1,42 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth import logout, login, views as auth_views
+from django.contrib.auth import logout, login
 from channels.layers import get_channel_layer
 from .forms import UserCreationForm, ProfileForm, CustomAuthenticationForm
 from .models import User, Notification
 
 
-class CustomLoginView(auth_views.LoginView):
-    authentication_form = CustomAuthenticationForm
-    template_name = 'accounts/login.html'
+def login_view(request):
+    """
+    Handles user authentication and login session management.
+    """
+    if request.user.is_authenticated:
+        return redirect('water:home')
 
-    def form_valid(self, form):
-        remember_me = form.cleaned_data.get('remember_me')
-        if not remember_me:
-            # Set session expiry to 0 seconds. So it will automatically expire when the browser is closed.
-            self.request.session.set_expiry(0)
-        return super().form_valid(form)
+    if request.method == 'POST':
+        form = CustomAuthenticationForm(request, data=request.POST)
+        if form.is_valid():
+            user = form.get_user()
+            login(request, user)
+
+            # If 'Remember Me' is not checked, the session expires when the browser is closed.
+            if not form.cleaned_data.get('remember_me'):
+                request.session.set_expiry(0)
+
+            messages.success(request, f"Welcome back, {user.first_name or user.email}!")
+
+            next_page = request.POST.get('next') or request.GET.get('next')
+            return redirect(next_page or 'water:home')
+    else:
+        form = CustomAuthenticationForm()
+
+    context = {
+        'form': form,
+        'title': 'Log In — Voltaqua',
+        'next': request.GET.get('next', '')
+    }
+    return render(request, 'accounts/login.html', context)
 
 
 def register(request):
@@ -80,8 +100,22 @@ def register(request):
 @login_required
 def notification_list(request):
     notifications = request.user.notifications.all()
-    context = {'notifications': notifications, 'title': 'My Notifications'}
+
+    context = {
+        'notifications': notifications,
+        'title': 'My Notifications',
+    }
     return render(request, 'accounts/notification_list.html', context)
+
+@login_required
+def mark_notification_read(request, notification_id):
+    notification = get_object_or_404(Notification, pk=notification_id, recipient=request.user)
+    if request.method == 'POST':
+        notification.is_read = True
+        notification.save()
+        messages.success(request, "Notification marked as read.")
+    return redirect('accounts:notification_list')
+
 
 @login_required
 def mark_notifications_read(request):

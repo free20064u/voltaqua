@@ -500,6 +500,7 @@ def enter_bill(request, site_id):
                         if apartment.occupants != occ:
                             apartment.occupants = occ
                             apartment.save(update_fields=['occupants'])
+
                         created_bills.append(bill)
                     
                     messages.success(
@@ -541,7 +542,7 @@ def record_payment(request, bill_id):
             payment.bill = bill
             payment.paid_at = timezone.now()
             payment.save()
-            
+
             # Check if bill is fully paid and update status
             total_paid = bill.payments.aggregate(Sum('amount')).get('amount__sum') or 0
             if total_paid >= bill.amount_due:

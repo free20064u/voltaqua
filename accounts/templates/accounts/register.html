@@ -46,6 +46,37 @@
                                 <div class="mb-3" style="display: none;">
                                     {{ field }}
                                 </div>
+                            {% elif field.name == 'role' %}
+                                <div class="mb-3">
+                                    <label class="form-label d-block fw-bold">{{ field.label }}</label>
+                                    {% for radio in field %}
+                                        <div class="form-check">
+                                            {{ radio.tag }}
+                                            <label class="form-check-label ms-2" for="{{ radio.id_for_label }}">
+                                                {{ radio.choice_label }}
+                                            </label>
+                                        </div>
+                                    {% endfor %}
+                                    {% if field.errors %}
+                                        <div class="invalid-feedback d-block">{{ field.errors }}</div>
+                                    {% endif %}
+                                </div>
+                            {% elif field.name == 'agreement' %}
+                                <div class="mb-4">
+                                    <label class="form-label d-block fw-bold">{{ field.label }}</label>
+                                    <div class="form-check">
+                                        {% for radio in field %}
+                                            {{ radio.tag }}
+                                            <label class="form-check-label ms-2" for="{{ radio.id_for_label }}">
+                                                I agree to the <a href="{% url 'base:terms' %}" target="_blank">Terms of Service</a> and 
+                                                <a href="{% url 'base:privacy' %}" target="_blank">Privacy Policy</a>
+                                            </label>
+                                        {% endfor %}
+                                    </div>
+                                    {% if field.errors %}
+                                        <div class="invalid-feedback d-block">{{ field.errors }}</div>
+                                    {% endif %}
+                                </div>
                             {% else %}
                                 <div class="mb-3">
                                     <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>

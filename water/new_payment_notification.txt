@@ -1,0 +1,14 @@
+Dear {{ user.first_name|default:user.email }},
+
+We have received a payment on your behalf for a bill associated with your apartment ({{ bill.apartment.number }}).
+
+Payment Details:
+- Payment Amount: {{ bill.currency }} {{ payment.amount }}
+- Payment Method: {{ payment.get_method_display }}
+- Payment Date: {{ payment.paid_at|date:"F j, Y" }}
+- For Bill ID: #{{ bill.id }} (Period: {{ bill.period_start }} to {{ bill.period_end }})
+
+You can view your full payment history by logging into your Voltaqua account.
+
+Thank you,
+The Voltaqua Team

@@ -9,11 +9,12 @@ app_name = 'accounts'
 urlpatterns = [
     # NOTE: You should move your existing login, logout, and register
     # URL patterns into this file to keep your accounts app self-contained.
-    path('login/', views.CustomLoginView.as_view(), name='login'),
+    path('login/', views.login_view, name='login'),
     path('register/', views.register, name='register'),
     path('logout/', views.logout_view, name='logout'),
     path('profile/', views.profile, name='profile'),
     path('notifications/', views.notification_list, name='notification_list'),
+    path('notifications/<int:notification_id>/mark-read/', views.mark_notification_read, name='mark_notification_read'),
     path('notifications/mark-read/', views.mark_notifications_read, name='mark_notifications_read'),
 
     # Password reset flow

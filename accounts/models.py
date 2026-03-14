@@ -44,6 +44,7 @@ class User(AbstractBaseUser, PermissionsMixin):
 	date_joined = models.DateTimeField(default=timezone.now)
 	# optional profile picture
 	profile_image = models.ImageField(upload_to='profiles/', blank=True, null=True)
+	receive_email_notifications = models.BooleanField(default=True, help_text="Receive email notifications for new bills and payments.")
 
 	objects = UserManager()
 

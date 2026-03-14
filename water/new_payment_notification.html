@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Payment Confirmation</title>
+</head>
+<body>
+    <p>Dear {{ user.first_name|default:user.email }},</p>
+    <p>We have received a payment on your behalf for a bill associated with your apartment ({{ bill.apartment.number }}).</p>
+    
+    <h3>Payment Details:</h3>
+    <ul>
+        <li><strong>Payment Amount:</strong> {{ bill.currency }} {{ payment.amount }}</li>
+        <li><strong>Payment Method:</strong> {{ payment.get_method_display }}</li>
+        <li><strong>Payment Date:</strong> {{ payment.paid_at|date:"F j, Y" }}</li>
+        <li><strong>For Bill ID:</strong> #{{ bill.id }} (Period: {{ bill.period_start }} to {{ bill.period_end }})</li>
+    </ul>
+    <p>You can view your full payment history by logging into your Voltaqua account.</p>
+    <p>Thank you,<br>The Voltaqua Team</p>
+</body>
+</html>

@@ -1,36 +1,84 @@
 {% extends 'base/base.html' %}
 {% load static %}
 
-{% block title %}Privacy Policy - Voltaqua{% endblock %}
-
-{% block extra_head %}
-    <link rel="stylesheet" href="{% static 'css/site.css' %}">
-{% endblock %}
+{% block title %}Privacy Policy — Voltaqua{% endblock %}
 
 {% block content %}
     <header class="hero py-5 mb-5 rounded-3 text-center">
         <div class="py-5 px-4">
             <img src="{% static 'img/small/voltaqua.png' %}" alt="Voltaqua" class="img-fluid mb-4" style="max-height: 80px;">
             <h1 class="display-4 fw-bold mb-3">Privacy Policy</h1>
-            <p class="lead mb-4">We are committed to protecting your privacy and personal data.</p>
+            <p class="lead mb-4">Your privacy is important to us. Learn how we handle your data at Voltaqua.</p>
         </div>
     </header>
 
-    <section class="mb-5">
-        <div class="row justify-content-center">
-            <div class="col-lg-8">
-                <h2 class="h4 fw-semibold mb-3">1. Information We Collect</h2>
-                <p class="text-muted">We collect information to provide better services to all our users. This includes information you provide to us directly and information we collect automatically. This is placeholder text. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed cursus ante dapibus diam. Sed nisi. Nulla quis sem at nibh elementum imperdiet.</p>
+    <div class="row justify-content-center mb-5">
+        <div class="col-lg-9">
+            <div class="mb-5">
+                <p class="text-muted"><strong>Last Updated:</strong> June 15, 2024</p>
+                <p class="text-muted fs-5">Voltaqua ("we," "us," or "our") is committed to protecting your privacy. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you visit our website and use our utility management services.</p>
+            </div>
 
-                <h2 class="h4 fw-semibold mt-4 mb-3">2. How We Use Information</h2>
-                <p class="text-muted">We use the information we collect to operate, maintain, and improve our services. This is placeholder text. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Curabitur sodales ligula in libero. Sed dignissim lacinia nunc. Curabitur tortor. Pellentesque nibh.</p>
+            <section class="mb-5">
+                <h2 class="h4 fw-bold mb-3">1. Information Collection</h2>
+                <p class="text-muted">We collect information that you provide directly to us, such as when you create an account, update your profile, or communicate with site administrators. This may include:</p>
+                <ul class="text-muted">
+                    <li><strong>Personal Data:</strong> Name, email address, phone number, and apartment number.</li>
+                    <li><strong>Utility Data:</strong> Water and electricity consumption data, meter readings, and occupancy counts.</li>
+                    <li><strong>Financial Data:</strong> Records of payments made to property management (we do not store credit card numbers directly).</li>
+                </ul>
+            </section>
 
-                <h2 class="h4 fw-semibold mt-4 mb-3">3. Information Sharing</h2>
-                <p class="text-muted">We do not share your personal information with companies, organizations, or individuals outside of Voltaqua except in specific circumstances. This is placeholder text. Morbi lectus risus, iaculis vel, suscipit quis, luctus non, massa. Fusce ac turpis quis ligula lacinia aliquet. Mauris ipsum.</p>
+            <section class="mb-5">
+                <h2 class="h4 fw-bold mb-3">2. How We Use Your Information</h2>
+                <p class="text-muted">We use the information we collect for various purposes, including to:</p>
+                <ul class="text-muted">
+                    <li>Provide, operate, and maintain our utility management platform.</li>
+                    <li>Calculate utility bills based on consumption and occupancy.</li>
+                    <li>Send you notifications regarding new bills, payments, and system maintenance.</li>
+                    <li>Improve our platform and develop new features.</li>
+                    <li>Comply with legal obligations and resolve disputes.</li>
+                </ul>
+            </section>
 
-                <h2 class="h4 fw-semibold mt-4 mb-3">4. Data Security</h2>
-                <p class="text-muted">We work hard to protect Voltaqua and our users from unauthorized access to or unauthorized alteration, disclosure, or destruction of information we hold. This is placeholder text. Nam nec ante. Sed lacinia, urna non tincidunt mattis, tortor neque adipiscing diam.</p>
+            <section class="mb-5">
+                <h2 class="h4 fw-bold mb-3">3. Sharing of Information</h2>
+                <p class="text-muted">We do not sell your personal data. We may share your information in the following situations:</p>
+                <ul class="text-muted">
+                    <li><strong>With Site Administrators:</strong> Property managers assigned to your block have access to your utility usage and billing records to manage services.</li>
+                    <li><strong>Service Providers:</strong> We may share data with third-party vendors who perform services for us, such as hosting or email delivery.</li>
+                    <li><strong>Legal Requirements:</strong> If required by law, we may disclose information to public authorities.</li>
+                </ul>
+            </section>
+
+            <section class="mb-5">
+                <h2 class="h4 fw-bold mb-3">4. Data Security</h2>
+                <p class="text-muted">We use administrative, technical, and physical security measures to help protect your personal information. While we have taken reasonable steps to secure the personal information you provide to us, please be aware that despite our efforts, no security measures are perfect or impenetrable.</p>
+            </section>
+
+            <section class="mb-5">
+                <h2 class="h4 fw-bold mb-3">5. Your Data Rights</h2>
+                <p class="text-muted">Depending on your location, you may have the right to access, correct, or delete your personal data. You can update much of your information through your profile page. To request deletion of your account or data, please contact your site administrator or our support team.</p>
+            </section>
+
+            <section class="mb-5">
+                <h2 class="h4 fw-bold mb-3">6. Changes to This Policy</h2>
+                <p class="text-muted">We may update our Privacy Policy from time to time. We will notify you of any changes by posting the new Privacy Policy on this page and updating the "Last Updated" date. You are advised to review this Privacy Policy periodically for any changes.</p>
+            </section>
+
+            <section class="mb-5">
+                <h2 class="h4 fw-bold mb-3">7. Contact Us</h2>
+                <p class="text-muted">If you have questions or comments about this Privacy Policy, please contact us at <a href="mailto:privacy@voltaqua.com" class="text-decoration-none">privacy@voltaqua.com</a>.</p>
+            </section>
+
+            
+            <div class="border-top pt-5 text-center">
+                <p class="text-muted mb-4">Looking for our rules of use? View our <a href="{% url 'base:terms' %}" class="text-decoration-none">Terms of Service</a>.</p>
+                <div class="d-flex gap-3 justify-content-center">
+                    <a href="{% url 'base:home' %}" class="btn btn-primary btn-lg">Back to Home</a>
+                    <a href="{% url 'base:about' %}" class="btn btn-outline-secondary btn-lg">About Us</a>
+                </div>
             </div>
         </div>
-    </section>
+    </div>
 {% endblock %}

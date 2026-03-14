@@ -1,7 +1,8 @@
 from django.test import TestCase, Client
 from django.utils import timezone
+from django.urls import reverse
 
-from accounts.models import User
+from accounts.models import User, Notification
 from .models import (
     Site, Apartment, Meter, ConsumptionSummary,
     Bill, Payment
@@ -241,3 +242,98 @@ class WaterDashboardTests(TestCase):
         # page should re-render with error
         self.assertEqual(resp.status_code, 200)
         self.assertContains(resp, 'No occupants recorded for any apartments')
+
+    def test_notification_on_bill_creation(self):
+        """Verify that a notification is sent to a resident when a bill is created for their apartment."""
+        self.client.force_login(self.block_admin)
+        block = self.site
+        # Create an apartment and assign the regular user to it
+        apt = Apartment.objects.create(site=block, number="N1", occupants=2, user=self.regular_user)
+
+        # POST a bill
+        today = timezone.now().date()
+        self.client.post(
+            reverse('water:enter-bill', kwargs={'site_id': block.pk}),
+            data={
+                'period_start': today,
+                'period_end': today,
+                'total_amount': '100',
+                'total_volume': '10',
+                f'occupants_{apt.id}': '2',
+            }
+        )
+
+        # Check that a notification was created for the regular user
+        self.assertEqual(Notification.objects.filter(recipient=self.regular_user).count(), 1)
+        notification = Notification.objects.get(recipient=self.regular_user)
+
+        # Check the message content
+        bill = Bill.objects.get(apartment=apt)
+        expected_message = f"New Water Bill: {bill.currency} {bill.amount_due} for period {bill.period_start} to {bill.period_end}"
+        self.assertEqual(notification.message, expected_message)
+
+    def test_notification_on_payment_creation(self):
+        """Verify that a notification is sent to a resident when a payment is recorded for their bill."""
+        self.client.force_login(self.block_admin)
+        block = self.site
+        # Create an apartment and assign the regular user to it
+        apt = Apartment.objects.create(site=block, number="N2", occupants=1, user=self.regular_user)
+
+        # Create a bill for this apartment
+        bill = Bill.objects.create(
+            user=self.block_admin,
+            site=block,
+            apartment=apt,
+            period_start=timezone.now().date(),
+            period_end=timezone.now().date(),
+            amount_due=150,
+            status='pending',
+        )
+
+        # POST a payment
+        self.client.post(
+            reverse('water:record-payment', kwargs={'bill_id': bill.id}),
+            data={'amount': "50.00", 'method': 'cash'}
+        )
+
+        # Check that a notification was created for the regular user
+        self.assertEqual(Notification.objects.filter(recipient=self.regular_user).count(), 1)
+        notification = Notification.objects.get(recipient=self.regular_user)
+
+        # Check the message content
+        payment = Payment.objects.get(bill=bill)
+        expected_message = f"Payment Received: {bill.currency} {payment.amount} for Bill #{bill.id}"
+        self.assertEqual(notification.message, expected_message)
+
+    def test_no_notification_for_unassigned_apartment(self):
+        """Verify no notification is sent if the apartment has no assigned user."""
+        self.client.force_login(self.block_admin)
+        block = self.site
+        # Create an apartment without a user
+        apt = Apartment.objects.create(site=block, number="N3", occupants=1, user=None)
+
+        # POST a bill
+        today = timezone.now().date()
+        self.client.post(
+            reverse('water:enter-bill', kwargs={'site_id': block.pk}),
+            data={
+                'period_start': today,
+                'period_end': today,
+                'total_amount': '50',
+                'total_volume': '5',
+                f'occupants_{apt.id}': '1',
+            }
+        )
+        # No notification should be created
+        self.assertEqual(Notification.objects.count(), 0)
+
+        # Get the created bill to test payment
+        bill = Bill.objects.get(apartment=apt)
+
+        # POST a payment
+        self.client.post(
+            reverse('water:record-payment', kwargs={'bill_id': bill.id}),
+            data={'amount': "50.00", 'method': 'cash'}
+        )
+        # Still no notification
+        self.assertEqual(Notification.objects.count(), 0)

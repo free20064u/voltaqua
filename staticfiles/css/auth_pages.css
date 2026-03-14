@@ -1,0 +1,17 @@
+body {
+    background: linear-gradient(135deg, #0d6efd 0%, #001f3f 100%);
+    min-height: 100vh;
+}
+
+.card {
+    border-radius: 1rem;
+}
+
+.profile-image-preview {
+    width: 120px;
+    height: 120px;
+    object-fit: cover;
+    border-radius: 50%;
+    border: 3px solid #fff;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}

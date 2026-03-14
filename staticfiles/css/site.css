@@ -1,0 +1,59 @@
+.hero {
+    background: linear-gradient(135deg, #0d6efd 0%, #001f3f 100%);
+    color: white;
+}
+
+.hero .lead {
+    color: rgba(255, 255, 255, 0.8) !important;
+}
+
+.feature-icon {
+    font-size: 1.6rem;
+    color: #0d6efd;
+    background-color: rgba(13, 110, 253, 0.1);
+    width: 4rem;
+    height: 4rem;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.stat-card {
+    min-height: 120px;
+}
+
+.table-actions a {
+    margin-right: .4rem;
+}
+
+.apartment-card {
+    border-left: 4px solid #0d6efd;
+}
+
+.overview-card {
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.overview-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 25px rgba(0,0,0,0.15) !important;
+}
+
+.footer-brand {
+    background-color: #001f3f; /* Dark blue from gradient */
+    color: white;
+}
+
+.navbar-brand-bg {
+    background-color: #001f3f; /* Dark blue from gradient */
+}
+
+.footer-social a {
+    transition: color 0.2s ease-in-out;
+}
+
+.footer-social a:hover {
+    color: #ffffff !important;
+}

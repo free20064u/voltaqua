@@ -1,3 +1,4 @@
+import environ
 from django.core.management.base import BaseCommand
 from faker import Faker
 from django.utils import timezone
@@ -9,6 +10,10 @@ from water.models import (
     Payment, BillOccupancy
 )
 from django.contrib.auth import get_user_model
+
+# Initialise environment variables
+env = environ.Env()
+environ.Env.read_env()
 
 faker = Faker()
 
@@ -22,7 +27,7 @@ def create_users(num_superusers=1, num_block_admins=1, num_residents=2):
     for _ in range(num_superusers):
         user = User.objects.create_user(
             email=faker.unique.email(),
-            password='password123',
+            password=env('DEFAULT_USER_PASSWORD'),
             first_name=faker.first_name(),
             last_name=faker.last_name(),
             role='superuser',
@@ -35,7 +40,7 @@ def create_users(num_superusers=1, num_block_admins=1, num_residents=2):
     for _ in range(num_block_admins):
         user = User.objects.create_user(
             email=faker.unique.email(),
-            password='password123',
+            password=env('DEFAULT_USER_PASSWORD'),
             first_name=faker.first_name(),
             last_name=faker.last_name(),
             role='block_admin',
@@ -48,7 +53,7 @@ def create_users(num_superusers=1, num_block_admins=1, num_residents=2):
     for _ in range(num_residents):
         user = User.objects.create_user(
             email=faker.unique.email(),
-            password='password123',
+            password=env('DEFAULT_USER_PASSWORD'),
             first_name=faker.first_name(),
             last_name=faker.last_name(),
             role='user',

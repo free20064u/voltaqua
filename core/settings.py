@@ -31,7 +31,6 @@ ALLOWED_HOSTS = ['*']  # Allow all hosts during development, change in productio
 # Application definition
 
 INSTALLED_APPS = [
-    'channels',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -75,16 +74,6 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'core.wsgi.application'
-
-# Tell Django to use the ASGI application for Channels
-ASGI_APPLICATION = 'core.asgi.application'
-
-# Channel layer configuration (using in-memory for development)
-CHANNEL_LAYERS = {
-    'default': {
-        'BACKEND': 'channels.layers.InMemoryChannelLayer',
-    },
-}
 
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases

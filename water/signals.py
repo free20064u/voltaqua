@@ -1,7 +1,5 @@
 from django.db.models.signals import post_save
-from channels.layers import get_channel_layer
-from asgiref.sync import async_to_sync
-from .models import Bill, Payment, Apartment, Site, Meter
+from .models import Bill, Payment
 from accounts.models import Notification
 from django.core.mail import send_mail
 from django.template.loader import render_to_string
@@ -9,14 +7,13 @@ from django.conf import settings
 
 
 def get_models_to_watch():
-    """Returns a list of models that should trigger a page refresh on save."""
-    return [Bill, Payment, Apartment, Site, Meter]
+    """Returns a list of models that should trigger a notification on save."""
+    return [Bill, Payment]
 
 
 def broadcast_data_update(sender, instance, **kwargs):
     """
-    Sends a message to the 'data_updates' group when a watched model is saved.
-    Also creates a DB notification and sends an email for new Bills and Payments.
+    Creates a DB notification and sends an email for new Bills and Payments.
     """
     created = kwargs.get('created', False)
 
@@ -72,33 +69,6 @@ def broadcast_data_update(sender, instance, **kwargs):
                 except Exception:
                     # You might want to log this error in a real-world scenario
                     pass
-
-            # --- Part 1b: Push real-time notification to the user ---
-            channel_layer = get_channel_layer()
-            if channel_layer:
-                async_to_sync(channel_layer.group_send)(
-                    f'user_{user_to_notify.id}',
-                    {
-                        'type': 'broadcast_message',
-                        'message': {
-                            'text': message
-                        }
-                    }
-                )
-
-    # --- Part 2: Broadcast WebSocket update ---
-    channel_layer = get_channel_layer()
-    if channel_layer:
-        try:
-            model_name = sender._meta.verbose_name.title()
-
-            async_to_sync(channel_layer.group_send)(
-                'data_updates',
-                {'type': 'data.update', 'message': f'{model_name} data has been updated.'}
-            )
-        except Exception:
-            # WebSocket broadcast failure should not interrupt the main application flow
-            pass
 
 
 for model in get_models_to_watch():

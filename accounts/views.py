@@ -2,7 +2,6 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import logout, login
-from channels.layers import get_channel_layer
 from .forms import UserCreationForm, ProfileForm, CustomAuthenticationForm
 from .models import User, Notification
 
@@ -57,33 +56,6 @@ def register(request):
 
             welcome_message = f'Welcome to Voltaqua, {user.first_name}!'
             welcome_notification = Notification.objects.create(recipient=user, message=welcome_message)
-
-            # 2. Send real-time notifications via Channels
-            from asgiref.sync import async_to_sync
-            channel_layer = get_channel_layer()
-
-            # Notify admins
-            async_to_sync(channel_layer.group_send)(
-                'block_admins',
-                {
-                    'type': 'broadcast_message',
-                    'message': {
-                        'text': admin_message
-                    }
-                }
-            )
-
-            # Send a private welcome message to the new user
-            async_to_sync(channel_layer.group_send)(
-                f'user_{user.id}',
-                {
-                    'type': 'broadcast_message',
-                    'message': {
-                        'id': welcome_notification.id,
-                        'text': welcome_notification.message
-                    }
-                }
-            )
 
             messages.success(request, 'Registration successful! Welcome.')
             return redirect('water:home')

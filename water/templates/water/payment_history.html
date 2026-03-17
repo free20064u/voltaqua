@@ -34,22 +34,22 @@
                     <thead>
                         <tr>
                             <th>Date Paid</th>
-                            <th>Bill ID</th>
+                            <th class="d-none d-md-table-cell">Bill ID</th>
                             <th>Bill Period</th>
                             <th class="text-end">Amount Paid</th>
-                            <th>Method</th>
-                            <th>Reference</th>
+                            <th class="d-none d-md-table-cell">Method</th>
+                            <th class="d-none d-md-table-cell">Reference</th>
                         </tr>
                     </thead>
                     <tbody>
                         {% for payment in payments %}
                         <tr>
-                            <td>{{ payment.paid_at|date:"M d, Y, P" }}</td>
-                            <td>#{{ payment.bill.id }}</td>
+                            <td>{{ payment.paid_at|date:"m d, Y, P" }}</td>
+                            <td class="d-none d-md-table-cell">#{{ payment.bill.id }}</td>
                             <td>{{ payment.bill.period_start|date:"M d, Y" }} - {{ payment.bill.period_end|date:"M d, Y" }}</td>
                             <td class="text-end">{{ currency_symbol }}{{ payment.amount|floatformat:2 }}</td>
-                            <td>{{ payment.get_method_display }}</td>
-                            <td>{{ payment.reference|default:"-" }}</td>
+                            <td class="d-none d-md-table-cell">{{ payment.get_method_display }}</td>
+                            <td class="d-none d-md-table-cell">{{ payment.reference|default:"-" }}</td>
                         </tr>
                         {% endfor %}
                     </tbody>

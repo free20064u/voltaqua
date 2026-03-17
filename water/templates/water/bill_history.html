@@ -18,7 +18,7 @@
             <thead class="table-light">
               <tr>
                 <th>Period</th>
-                <th>Issued</th>
+                <th class="d-none d-md-table-cell">Issued</th>
                 <th>Amount Due</th>
                 <th>Paid</th>
                 <th>Balance</th>
@@ -30,7 +30,7 @@
               {% for bill in bills %}
               <tr>
                 <td>{{ bill.period_start|date:"M d" }} - {{ bill.period_end|date:"M d, Y" }}</td>
-                <td>{{ bill.issued_at|date:"M d, Y" }}</td>
+                <td class="d-none d-md-table-cell">{{ bill.issued_at|date:"M d, Y" }}</td>
                 <td>{{ bill.currency }} {{ bill.amount_due|floatformat:2 }}</td>
                 <td>{{ bill.currency }} {{ bill.total_paid|floatformat:2 }}</td>
                 <td><strong>{{ bill.currency }} {{ bill.balance|floatformat:2 }}</strong></td>
@@ -46,7 +46,7 @@
                 <td class="text-end">
                   {% if bill.status != 'paid' and request.user.role == 'block_admin' %}
                     <a href="{% url 'water:record-payment' bill.id %}" class="btn btn-sm btn-outline-success">
-                      Record Payment
+                      Pay
                     </a>
                   {% endif %}
                 </td>

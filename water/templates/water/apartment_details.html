@@ -13,45 +13,45 @@
     <!-- Apartment Statistics -->
     <div class="row g-3 mb-3">
       <div class="col-6 col-md-4 col-lg-2">
-        <div class="card stat-card shadow-sm">
+        <div class="card stat-card shadow-sm h-100 border-primary">
           <div class="card-body text-center">
-            <h6 class="text-muted">Total Consumption</h6>
-            <h3 class="fw-bold">{{ stats.total_consumption_all_time }}</h3>
+            <h6 class="text-muted text-uppercase small fw-bold">Total Consumption</h6>
+            <h3 class="fw-bold text-primary">{{ stats.total_consumption_all_time }}</h3>
             <small class="text-muted">m³ (all time)</small>
           </div>
         </div>
       </div>
       <div class="col-6 col-md-4 col-lg-2">
-        <div class="card stat-card shadow-sm">
+        <div class="card stat-card shadow-sm h-100 border-info">
           <div class="card-body text-center">
-            <h6 class="text-muted">Active Meters</h6>
-            <h3 class="fw-bold">{{ stats.active_meters }}</h3>
+            <h6 class="text-muted text-uppercase small fw-bold">Active Meters</h6>
+            <h3 class="fw-bold text-info">{{ stats.active_meters }}</h3>
             <small class="text-muted">in apartment</small>
           </div>
         </div>
       </div>
       <div class="col-6 col-md-4 col-lg-2">
-        <div class="card stat-card shadow-sm">
+        <div class="card stat-card shadow-sm h-100 border-success">
           <div class="card-body text-center">
-            <h6 class="text-muted">Total Paid</h6>
-            <h3 class="fw-bold">{{ stats.total_paid|floatformat:2 }}</h3>
+            <h6 class="text-muted text-uppercase small fw-bold">Total Paid</h6>
+            <h3 class="fw-bold text-success">{{ stats.total_paid|floatformat:2 }}</h3>
             <small class="text-muted">collected</small>
           </div>
         </div>
       </div>
       <div class="col-6 col-md-4 col-lg-2">
-        <div class="card stat-card shadow-sm">
+        <div class="card stat-card shadow-sm h-100 border-danger">
           <div class="card-body text-center">
-            <h6 class="text-muted">Outstanding Bills</h6>
-            <h3 class="fw-bold">{{ stats.outstanding_bills }}</h3>
+            <h6 class="text-muted text-uppercase small fw-bold">Outstanding Bills</h6>
+            <h3 class="fw-bold text-danger">{{ stats.outstanding_bills }}</h3>
             <small class="text-muted">unpaid</small>
           </div>
         </div>
       </div>
       <div class="col">
-        <div class="card stat-card shadow-sm">
+        <div class="card stat-card shadow-sm h-100">
           <div class="card-body text-center">
-            <h6 class="text-muted">Collection Rate</h6>
+            <h6 class="text-muted text-uppercase small fw-bold">Collection Rate</h6>
             <h3 class="fw-bold">{{ stats.collection_rate }}%</h3>
             <div class="progress mt-2">
               <div class="progress-bar bg-success" role="progressbar" style="width: {{ stats.collection_rate }}%" aria-valuenow="{{ stats.collection_rate }}" aria-valuemin="0" aria-valuemax="100"></div>

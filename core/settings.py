@@ -24,8 +24,10 @@ SECRET_KEY = 'django-insecure-4262g$yz^-l)1_o+nr7nl5mof9_-6@jr6a#y(i_5!0ao%uw8h^
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
-
-ALLOWED_HOSTS = ['*']  # Allow all hosts during development, change in production
+if DEBUG:
+    ALLOWED_HOSTS = ['*']  # Allow all hosts during development, change in production
+else:
+    ALLOWED_HOSTS = ['utility.ecoasseteng.com', 'www.utility.ecoasseteng.com']  # Set your production domain here
 
 
 # Application definition

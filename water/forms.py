@@ -34,7 +34,7 @@ class ApartmentForm(forms.ModelForm):
         User = get_user_model()
         self.fields['user'].queryset = User.objects.filter(role='user')
         self.fields['user'].label = "Assigned Resident"
-        self.fields['user'].required = True
+        self.fields['user'].required = False
 
 
 class BillEntryForm(forms.Form):

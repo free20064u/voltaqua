@@ -8,6 +8,7 @@ from decimal import Decimal, ROUND_HALF_UP
 from django.contrib import messages
 from datetime import timedelta
 from django.db.models.functions import Coalesce
+from django.contrib.auth import get_user_model
 
 from .models import (
     Site,
@@ -124,7 +125,7 @@ def home_dashboard(request):
 
     role = getattr(request.user, 'role', 'user')
 
-    if role == 'superuser':
+    if role == 'superuser' or request.user.is_superuser:
         return superuser_dashboard(request)
     elif role == 'block_admin':
         return block_admin_dashboard(request)
@@ -383,6 +384,43 @@ def admins_list(request):
         'total_admins': len(admin_data),
     }
     return render(request, 'water/admins_list.html', context)
+
+
+@login_required
+def manage_users(request):
+    """Superuser view: List all users and manage their roles."""
+    if request.user.role != 'superuser':
+        raise Http404
+
+    User = get_user_model()
+
+    if request.method == 'POST':
+        user_id = request.POST.get('user_id')
+        new_role = request.POST.get('role')
+        
+        user_obj = get_object_or_404(User, pk=user_id)
+        
+        # Prevent changing own role to avoid locking out
+        if user_obj == request.user:
+            messages.error(request, "You cannot change your own role.")
+        elif new_role in dict(User.USER_ROLE_CHOICES):
+            user_obj.role = new_role
+            # Update permissions based on role
+            user_obj.is_superuser = (new_role == 'superuser')
+            user_obj.is_staff = (new_role == 'superuser')
+            user_obj.save()
+            messages.success(request, f"Role for {user_obj.email} updated to {user_obj.get_role_display()}.")
+        else:
+            messages.error(request, "Invalid role selected.")
+        return redirect('water:manage-users')
+
+    users = User.objects.all().order_by('-date_joined')
+    context = {
+        'title': 'Manage Users — Voltaqua',
+        'users': users,
+        'roles': User.USER_ROLE_CHOICES,
+    }
+    return render(request, 'water/manage_users.html', context)
 
 
 @login_required

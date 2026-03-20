@@ -17,6 +17,7 @@ urlpatterns = [
     path('apartments/', views.apartments_list, name='apartments-list'),
     path('meters/', views.meters_list, name='meters-list'),
     path('admins/', views.admins_list, name='admins-list'),
+    path('users/', views.manage_users, name='manage-users'),
     path('setup/block/', views.create_site, name='create-site'),
     path('setup/meter/', views.create_meter, name='create-meter'),
     path('setup/join/', views.join_site, name='join-site'),

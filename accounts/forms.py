@@ -38,7 +38,11 @@ class CustomAuthenticationForm(AuthenticationForm):
     def clean(self):
         cleaned_data = super().clean()
         user = self.user_cache
-        if user is not None and user.role == 'user' and not user.is_superuser:
+        
+        if user is not None and user.is_superuser:
+            return cleaned_data
+
+        if user is not None and user.role == 'user':
             try:
                 apartment = Apartment.objects.get(user=user)
                 if not apartment.is_active:

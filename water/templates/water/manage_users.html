@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>Manage Users</h1>
+    </div>
+
+    <div class="card shadow-sm">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover mb-0 align-middle">
+                    <thead class="table-light">
+                        <tr>
+                            <th>User</th>
+                            <th>Email</th>
+                            <th>Current Role</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for user in users %}
+                        <tr>
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    {% if user.profile_image %}
+                                        <img src="{{ user.profile_image.url }}" alt="" class="rounded-circle me-2" style="width: 32px; height: 32px; object-fit: cover;">
+                                    {% else %}
+                                        <div class="rounded-circle bg-secondary text-white d-flex align-items-center justify-content-center me-2" style="width: 32px; height: 32px;">
+                                            {{ user.first_name|first|default:user.email|first|upper }}
+                                        </div>
+                                    {% endif %}
+                                    <span>{{ user.first_name }} {{ user.last_name }}</span>
+                                </div>
+                            </td>
+                            <td>{{ user.email }}</td>
+                            <td>
+                                <span class="badge {% if user.role == 'superuser' %}bg-danger{% elif user.role == 'block_admin' %}bg-warning text-dark{% else %}bg-info text-dark{% endif %}">
+                                    {{ user.get_role_display }}
+                                </span>
+                            </td>
+                            <td>
+                                {% if user != request.user %}
+                                <form method="post" class="d-flex gap-2">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="user_id" value="{{ user.id }}">
+                                    <select name="role" class="form-select form-select-sm" style="width: auto;" onchange="this.form.submit()">
+                                        {% for role_code, role_label in roles %}
+                                            <option value="{{ role_code }}" {% if user.role == role_code %}selected{% endif %}>
+                                                {{ role_label }}
+                                            </option>
+                                        {% endfor %}
+                                    </select>
+                                    <noscript>
+                                        <button type="submit" class="btn btn-sm btn-primary">Update</button>
+                                    </noscript>
+                                </form>
+                                {% else %}
+                                <span class="text-muted small">Current User</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="4" class="text-center py-3">No users found.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

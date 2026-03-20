@@ -29,13 +29,10 @@ urlpatterns = [
     path('accounts/', include('accounts.urls')),
 ]
 
-# during development serve media files
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 else:
-    # This is not recommended for production.
-    # In a real production environment, you should use a web server like
-    # Nginx or a cloud storage service (e.g., S3) to serve media files.
     urlpatterns += [
-        re_path(r'^%s(?P<path>.*)$' % settings.MEDIA_URL.lstrip('/'), serve, {'document_root': settings.MEDIA_ROOT}),
+        re_path(r'^media/(?P<path>.*)$', serve, {'document_root': settings.MEDIA_ROOT}),
+        re_path(r'^static/(?P<path>.*)$', serve, {'document_root': settings.STATIC_ROOT}),
     ]

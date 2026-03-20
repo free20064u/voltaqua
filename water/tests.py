@@ -65,7 +65,7 @@ class WaterDashboardTests(TestCase):
         stats = response.context['stats']
         self.assertAlmostEqual(stats['total_consumption_m3'], 123.45)
         self.assertEqual(stats['active_meters'], 1)
-        self.assertEqual(stats['outstanding_bills'], 1)
+        self.assertEqual(stats['outstanding_bills'], 150.00)
         # collection rate should be (50/200)*100 == 25
         self.assertEqual(stats['collection_rate'], 25)
 

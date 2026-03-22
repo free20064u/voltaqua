@@ -1,5 +1,5 @@
-from PIL import Image
 from django.db import models
+from cloudinary.models import CloudinaryField
 from django.contrib.auth.models import (
 	AbstractBaseUser, PermissionsMixin, BaseUserManager
 )
@@ -44,7 +44,7 @@ class User(AbstractBaseUser, PermissionsMixin):
 	role = models.CharField(max_length=20, choices=USER_ROLE_CHOICES, default='user')
 	date_joined = models.DateTimeField(default=timezone.now)
 	# optional profile picture
-	profile_image = models.ImageField(upload_to='profiles/', blank=True, null=True)
+	profile_image = CloudinaryField('image', blank=True, null=True)
 	receive_email_notifications = models.BooleanField(default=True, help_text="Receive email notifications for new bills and payments.")
 
 	objects = UserManager()
@@ -54,26 +54,6 @@ class User(AbstractBaseUser, PermissionsMixin):
 
 	def __str__(self):
 		return self.email
-
-	def save(self, *args, **kwargs):
-		# Delete old image if a new one is uploaded
-		if self.pk:
-			try:
-				old_profile = User.objects.get(pk=self.pk)
-				if old_profile.profile_image and old_profile.profile_image != self.profile_image:
-					old_profile.profile_image.delete(save=False)
-			except User.DoesNotExist:
-				pass
-
-		super().save(*args, **kwargs)
-
-		if self.profile_image:
-			img = Image.open(self.profile_image.path)
-
-			if img.height > 300 or img.width > 300:
-				output_size = (300, 300)
-				img.thumbnail(output_size)
-				img.save(self.profile_image.path)
 
 	@property
 	def unread_notification_count(self):

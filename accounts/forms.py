@@ -6,6 +6,7 @@ from water.models import Apartment
 
 
 class ProfileForm(forms.ModelForm):
+
     class Meta:
         model = User
         fields = ('first_name', 'last_name', 'profile_image', 'receive_email_notifications')

@@ -1,4 +1,5 @@
 from django.db import models
+import cloudinary.uploader
 from cloudinary.models import CloudinaryField
 from django.contrib.auth.models import (
 	AbstractBaseUser, PermissionsMixin, BaseUserManager
@@ -44,7 +45,12 @@ class User(AbstractBaseUser, PermissionsMixin):
 	role = models.CharField(max_length=20, choices=USER_ROLE_CHOICES, default='user')
 	date_joined = models.DateTimeField(default=timezone.now)
 	# optional profile picture
-	profile_image = CloudinaryField('image', blank=True, null=True)
+	profile_image = CloudinaryField(
+		'image',
+		blank=True,
+		null=True,
+		transformation={'width': 300, 'height': 300, 'crop': 'fill', 'gravity': 'face'}
+	)
 	receive_email_notifications = models.BooleanField(default=True, help_text="Receive email notifications for new bills and payments.")
 
 	objects = UserManager()
@@ -58,6 +64,16 @@ class User(AbstractBaseUser, PermissionsMixin):
 	@property
 	def unread_notification_count(self):
 		return self.notifications.filter(is_read=False).count()
+
+	def save(self, *args, **kwargs):
+		if self.pk:
+			try:
+				old_user = User.objects.get(pk=self.pk)
+				if old_user.profile_image and old_user.profile_image != self.profile_image:
+					cloudinary.uploader.destroy(old_user.profile_image.public_id)
+			except Exception:
+				pass
+		super().save(*args, **kwargs)
 
 
 class Notification(models.Model):

@@ -116,10 +116,10 @@
                   <tr>
                     <th>Site</th>
                     <th>Apartment</th>
-                    <th>User</th>
+                    <th class="d-none d-md-table-cell">User</th>
                     <th>Amount</th>
                     <th>Status</th>
-                    <th>Issued On</th>
+                    <th class="d-none d-lg-table-cell">Issued On</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -135,18 +135,18 @@
                         <span class="text-muted">—</span>
                       {% endif %}
                     </td>
-                    <td>
+                    <td class="d-none d-md-table-cell">
                       {% if bill.apartment and bill.apartment.user %}
                         {{ bill.apartment.user.first_name }} {{ bill.apartment.user.last_name }}
                       {% else %}
                         <span class="text-muted">—</span>
                       {% endif %}
                     </td>
-                    <td>{{ bill.currency }} {{ bill.amount_due|floatformat:2 }}</td>
+                    <td>{{ bill.currency }} {{ bill.total_bill|floatformat:2 }}</td>
                     <td>
                       <span class="badge {% if bill.status == 'paid' %}bg-success{% elif bill.status == 'pending' %}bg-warning text-dark{% else %}bg-danger{% endif %}">{{ bill.status|title }}</span>
                     </td>
-                    <td>{{ bill.issued_at|date:"M d, Y" }}</td>
+                    <td class="d-none d-lg-table-cell">{{ bill.issued_at|date:"M d, Y" }}</td>
                   </tr>
                   {% empty %}
                   <tr>

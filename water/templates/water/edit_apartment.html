@@ -56,6 +56,19 @@
                 </small>
               </div>
 
+              <div class="mb-3 form-check">
+                {{ form.is_active }}
+                <label for="{{ form.is_active.id_for_label }}" class="form-check-label"><strong>Is Active</strong></label>
+                {% if form.is_active.errors %}
+                  <div class="invalid-feedback d-block">
+                    {% for error in form.is_active.errors %}{{ error }}{% endfor %}
+                  </div>
+                {% endif %}
+                <small class="form-text text-muted d-block">
+                  Deactivated apartments will not be included in bill distributions.
+                </small>
+              </div>
+
               {{ form.user.as_hidden }}
 
               <div class="d-grid gap-2">

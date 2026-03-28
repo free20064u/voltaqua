@@ -5,7 +5,7 @@ A new water bill has been issued for your apartment ({{ bill.apartment.number }}
 Bill Details:
 - Bill ID: #{{ bill.id }}
 - Billing Period: {{ bill.period_start }} to {{ bill.period_end }}
-- Amount Due: {{ bill.currency }} {{ bill.amount_due }}
+- Amount Due: {{ bill.currency }} {{ bill.total_bill }}
 - Due Date: {{ bill.due_at|date:"F j, Y" }}
 
 You can view the full details and manage your bills by logging into your Voltaqua account.

@@ -32,9 +32,9 @@
               <tr>
                 <th>Block</th>
                 <th>Apartment #</th>
-                <th>Occupants</th>
-                <th>Today's Consumption</th>
-                <th>Active Meters</th>
+                <th class="d-none d-md-table-cell">Occupants</th>
+                <th class="d-none d-lg-table-cell">Today's Consumption</th>
+                <th class="d-none d-lg-table-cell">Active Meters</th>
                 <th>Outstanding Bills</th>
                 <th class="text-center">Action</th>
               </tr>
@@ -47,13 +47,13 @@
                   <br><small class="text-muted">{{ item.apartment.site.name }}</small>
                 </td>
                 <td><strong>{{ item.apartment.number }}</strong></td>
-                <td>
+                <td class="d-none d-md-table-cell">
                   <span class="badge bg-primary">{{ item.apartment.occupants }}</span>
                 </td>
-                <td>
+                <td class="d-none d-lg-table-cell">
                   <strong>{{ item.stats.total_consumption_m3 }}</strong> m³
                 </td>
-                <td>{{ item.stats.active_meters }}</td>
+                <td class="d-none d-lg-table-cell">{{ item.stats.active_meters }}</td>
                 <td>
                   <span class="badge {% if item.stats.outstanding_bills > 0 %}bg-warning text-dark{% else %}bg-success{% endif %}">
                     {{ item.stats.outstanding_bills }}

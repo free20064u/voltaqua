@@ -48,7 +48,7 @@ class Apartment(models.Model):
         blank=True,
         related_name='residences',
     )
-    is_active = models.BooleanField(default=False)
+    is_active = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
@@ -116,7 +116,9 @@ class Bill(models.Model):
     )
     period_start = models.DateField()
     period_end = models.DateField()
-    amount_due = models.DecimalField(max_digits=12, decimal_places=2)
+    total_bill = models.DecimalField(max_digits=12, decimal_places=2)
+    water_bill = models.DecimalField(max_digits=12, decimal_places=2, null=True, blank=True)
+    dustbin_bill = models.DecimalField(max_digits=12, decimal_places=2, default=0, null=True, blank=True)
     volume_consumed = models.DecimalField(max_digits=12, decimal_places=2, default=0, null=True, blank=True)
     currency = models.CharField(max_length=3, default='GHS')
     status = models.CharField(max_length=20, default='pending')
@@ -124,7 +126,12 @@ class Bill(models.Model):
     due_at = models.DateTimeField(null=True, blank=True)
 
     def __str__(self):
-        return f"Bill {self.id} - {self.site.code} - {self.amount_due}"
+        return f"Bill {self.id} - {self.site.code} - {self.total_bill}"
+
+    @property
+    def amount_due(self):
+        """Backward-compatible alias for older code still using `amount_due`."""
+        return self.total_bill
 
 
 class BillOccupancy(models.Model):

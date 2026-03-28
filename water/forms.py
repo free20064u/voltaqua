@@ -9,7 +9,7 @@ class ApartmentForm(forms.ModelForm):
     
     class Meta:
         model = Apartment
-        fields = ['number', 'occupants', 'user']
+        fields = ['number', 'occupants', 'user', 'is_active']
         widgets = {
             'number': forms.TextInput(attrs={
                 'class': 'form-control',
@@ -23,6 +23,9 @@ class ApartmentForm(forms.ModelForm):
             }),
             'user': forms.Select(attrs={
                 'class': 'form-select',
+            }),
+            'is_active': forms.CheckboxInput(attrs={
+                'class': 'form-check-input',
             }),
         }
     
@@ -58,7 +61,7 @@ class BillEntryForm(forms.Form):
         help_text='Last day of the billing period',
     )
     
-    total_amount = forms.DecimalField(
+    water_bill = forms.DecimalField(
         max_digits=12,
         decimal_places=2,
         widget=forms.NumberInput(attrs={
@@ -67,8 +70,22 @@ class BillEntryForm(forms.Form):
             'step': '0.01',
             'min': '0',
         }),
-        label='Total Block Bill Amount',
+        label='Total Block Water Bill',
         help_text='Total water bill for the entire block. This will be distributed to apartments based on occupancy.',
+    )
+
+    dustbin_bill = forms.DecimalField(
+        max_digits=12,
+        decimal_places=2,
+        widget=forms.NumberInput(attrs={
+            'class': 'form-control',
+            'placeholder': '0.00',
+            'step': '0.01',
+            'min': '0',
+        }),
+        label='Dustbin Bill',
+        help_text='Total dustbin/waste management bill for the block. This will be distributed equally among all active apartments.',
+        initial=0.00,
     )
 
     total_volume = forms.DecimalField(
@@ -107,14 +124,18 @@ class BillEntryForm(forms.Form):
         cleaned_data = super().clean()
         period_start = cleaned_data.get('period_start')
         period_end = cleaned_data.get('period_end')
-        total_amount = cleaned_data.get('total_amount')
+        water_bill = cleaned_data.get('water_bill')
+        dustbin_bill = cleaned_data.get('dustbin_bill')
         total_volume = cleaned_data.get('total_volume')
         
         if period_start and period_end and period_start > period_end:
             raise forms.ValidationError('Period start date must be before period end date.')
         
-        if total_amount and total_amount < 0:
+        if water_bill and water_bill < 0:
             raise forms.ValidationError('Bill amount must be positive.')
+
+        if dustbin_bill and dustbin_bill < 0:
+            raise forms.ValidationError('Dustbin bill must be positive.')
             
         if total_volume and total_volume < 0:
             raise forms.ValidationError('Total volume must be positive.')

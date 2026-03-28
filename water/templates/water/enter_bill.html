@@ -56,17 +56,31 @@
               </div>
 
               <div class="mb-4">
-                <label for="{{ form.total_amount.id_for_label }}" class="form-label"><strong>Total Block Bill Amount</strong></label>
+                <label for="{{ form.water_bill.id_for_label }}" class="form-label"><strong>Total Block Water Bill Amount</strong></label>
                 <div class="input-group">
                   <span class="input-group-text">{{ currency_symbol }}</span>
-                  {{ form.total_amount }}
+                  {{ form.water_bill }}
                 </div>
-                {% if form.total_amount.errors %}
+                {% if form.water_bill.errors %}
                   <div class="invalid-feedback d-block">
-                    {% for error in form.total_amount.errors %}{{ error }}{% endfor %}
+                    {% for error in form.water_bill.errors %}{{ error }}{% endfor %}
                   </div>
                 {% endif %}
-                <small class="form-text text-muted d-block mt-1">{{ form.total_amount.help_text }}</small>
+                <small class="form-text text-muted d-block mt-1">{{ form.water_bill.help_text }}</small>
+              </div>
+
+              <div class="mb-4">
+                <label for="{{ form.dustbin_bill.id_for_label }}" class="form-label"><strong>Dustbin Bill</strong></label>
+                <div class="input-group">
+                  <span class="input-group-text">{{ currency_symbol }}</span>
+                  {{ form.dustbin_bill }}
+                </div>
+                {% if form.dustbin_bill.errors %}
+                  <div class="invalid-feedback d-block">
+                    {% for error in form.dustbin_bill.errors %}{{ error }}{% endfor %}
+                  </div>
+                {% endif %}
+                <small class="form-text text-muted d-block mt-1">{{ form.dustbin_bill.help_text }}</small>
               </div>
 
               <div class="mb-4">

@@ -31,25 +31,25 @@
             <thead class="table-light">
               <tr>
                 <th>Serial Number</th>
-                <th>Model</th>
+                <th class="d-none d-lg-table-cell">Model</th>
                 <th>Block</th>
-                <th>Apartment</th>
+                <th class="d-none d-md-table-cell">Apartment</th>
                 <th>Status</th>
-                <th>Latest Reading</th>
-                <th>Installed</th>
+                <th class="d-none d-lg-table-cell">Latest Reading</th>
+                <th class="d-none d-md-table-cell">Installed</th>
               </tr>
             </thead>
             <tbody>
               {% for item in meter_data %}
               <tr>
                 <td><strong>{{ item.meter.serial_number }}</strong></td>
-                <td>{{ item.meter.model }}</td>
+                <td class="d-none d-lg-table-cell">{{ item.meter.model }}</td>
                 <td>
                   <a href="{% url 'water:block-dashboard' item.site.id %}" class="text-decoration-none">
                     {{ item.site.code }}
                   </a>
                 </td>
-                <td>
+                <td class="d-none d-md-table-cell">
                   {% if item.apartment %}
                     <a href="{% url 'water:apartment-dashboard' item.apartment.id %}" class="text-decoration-none">
                       Apt {{ item.apartment.number }}
@@ -67,7 +67,7 @@
                     <span class="badge bg-warning text-dark">{{ item.meter.get_status_display }}</span>
                   {% endif %}
                 </td>
-                <td>
+                <td class="d-none d-lg-table-cell">
                   {% if item.latest_reading %}
                     <strong>{{ item.latest_reading.value|floatformat:2 }}</strong> {{ item.latest_reading.sensor.unit }}
                     <br><small class="text-muted">{{ item.latest_reading.timestamp|date:"M d, H:i" }}</small>
@@ -75,7 +75,7 @@
                     <span class="text-muted">No readings</span>
                   {% endif %}
                 </td>
-                <td>
+                <td class="d-none d-md-table-cell">
                   {% if item.meter.installed_at %}
                     {{ item.meter.installed_at|date:"M d, Y" }}
                   {% else %}

@@ -143,7 +143,7 @@
                 <thead>
                   <tr>
                     <th>Apartment</th>
-                    <th>User</th>
+                    <th class="d-none d-md-table-cell">User</th>
                     <th>Amount</th>
                     <th>Status</th>
                     <th>Actions</th>
@@ -159,14 +159,14 @@
                         Block Bill
                       {% endif %}
                     </td>
-                    <td>
+                    <td class="d-none d-md-table-cell">
                       {% if bill.apartment and bill.apartment.user %}
                         {{ bill.apartment.user.first_name }} {{ bill.apartment.user.last_name }}
                       {% else %}
                         <span class="text-muted">—</span>
                       {% endif %}
                     </td>
-                    <td>{{ bill.currency }} {{ bill.amount_due|floatformat:2 }}</td>
+                    <td>{{ bill.currency }} {{ bill.total_bill|floatformat:2 }}</td>
                     <td><span class="badge {% if bill.status == 'paid' %}bg-success{% elif bill.status == 'pending' %}bg-warning text-dark{% else %}bg-danger{% endif %}">{{ bill.status|title }}</span></td>
                     <td>
                       {% if bill.status != 'paid' and request.user.role == 'block_admin' %}

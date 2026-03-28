@@ -31,7 +31,7 @@ def broadcast_data_update(sender, instance, **kwargs):
             if bill.apartment and bill.apartment.user:
                 user_to_notify = bill.apartment.user
                 subject = f"New Water Bill from Voltaqua"
-                message = f"New Water Bill: {bill.currency} {bill.amount_due} for period {bill.period_start} to {bill.period_end}"
+                message = f"New Water Bill: {bill.currency} {bill.total_bill} for period {bill.period_start} to {bill.period_end}"
                 html_template = 'water/email/new_bill_notification.html'
                 text_template = 'water/email/new_bill_notification.txt'
                 context = {'user': user_to_notify, 'bill': bill}

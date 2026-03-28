@@ -175,7 +175,7 @@ def create_bills(users_dict, sites, apartments, count=30):
                                 apartment=apartment,
                                 period_start=start,
                                 period_end=end,
-                                amount_due=round(apartment_share, 2),
+                                total_bill=round(apartment_share, 2),
                                 status=random.choice(['pending', 'paid', 'overdue']),
                                 due_at=end + timezone.timedelta(days=30),
                             )
@@ -193,7 +193,7 @@ def create_bills(users_dict, sites, apartments, count=30):
                         apartment=None,
                         period_start=start,
                         period_end=end,
-                        amount_due=total_block_amount,
+                        total_bill=total_block_amount,
                         status=random.choice(['pending', 'paid', 'overdue']),
                         due_at=end + timezone.timedelta(days=30),
                     )
@@ -207,7 +207,7 @@ def create_payments(bills):
         if bill.status == 'paid':
             Payment.objects.create(
                 bill=bill,
-                amount=bill.amount_due,
+                amount=bill.total_bill,
                 paid_at=bill.due_at - timezone.timedelta(days=random.randint(1,10)),
                 method=random.choice(['credit_card','bank_transfer','cash']),
                 reference=faker.uuid4(),

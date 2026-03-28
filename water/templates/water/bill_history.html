@@ -19,8 +19,11 @@
               <tr>
                 <th>Period</th>
                 <th class="d-none d-md-table-cell">Issued</th>
-                <th>Amount Due</th>
-                <th>Paid</th>
+                <th class="d-none d-lg-table-cell">Water Bill</th>
+                <th class="d-none d-lg-table-cell">Dustbin Bill</th>
+                <th>Total Bill</th>
+                <th class="d-none d-md-table-cell">Paid</th>
+                <th class="d-none d-md-table-cell">Credit Applied</th>
                 <th>Balance</th>
                 <th>Status</th>
                 <th class="text-end">Actions</th>
@@ -31,8 +34,11 @@
               <tr>
                 <td>{{ bill.period_start|date:"M d" }} - {{ bill.period_end|date:"M d, Y" }}</td>
                 <td class="d-none d-md-table-cell">{{ bill.issued_at|date:"M d, Y" }}</td>
-                <td>{{ bill.currency }} {{ bill.amount_due|floatformat:2 }}</td>
-                <td>{{ bill.currency }} {{ bill.total_paid|floatformat:2 }}</td>
+                <td class="d-none d-lg-table-cell">{{ bill.currency }} {{ bill.water_bill|floatformat:2 }}</td>
+                <td class="d-none d-lg-table-cell">{{ bill.currency }} {{ bill.dustbin_bill|floatformat:2 }}</td>
+                <td><strong>{{ bill.currency }} {{ bill.total_bill|floatformat:2 }}</strong></td>
+                <td class="d-none d-md-table-cell">{{ bill.currency }} {{ bill.total_paid|floatformat:2 }}</td>
+                <td class="d-none d-md-table-cell">{{ bill.currency }} {{ bill.credit_applied|default:0|floatformat:2 }}</td>
                 <td><strong>{{ bill.currency }} {{ bill.balance|floatformat:2 }}</strong></td>
                 <td>
                   {% if bill.status == 'paid' %}
@@ -51,9 +57,16 @@
                   {% endif %}
                 </td>
               </tr>
+              {% if bill.carryover_credit and bill.carryover_credit > 0 %}
+              <tr class="table-light">
+                <td colspan="10" class="small text-muted">
+                  Extra payment carried forward: {{ bill.currency }} {{ bill.carryover_credit|floatformat:2 }}
+                </td>
+              </tr>
+              {% endif %}
               {% empty %}
               <tr>
-                <td colspan="7" class="text-center text-muted py-4">No bills found for this apartment.</td>
+                <td colspan="10" class="text-center text-muted py-4">No bills found for this apartment.</td>
               </tr>
               {% endfor %}
             </tbody>

@@ -13,7 +13,7 @@
                     <thead class="table-light">
                         <tr>
                             <th>User</th>
-                            <th>Email</th>
+                            <th class="d-none d-md-table-cell">Email</th>
                             <th>Current Role</th>
                             <th>Action</th>
                         </tr>
@@ -33,7 +33,7 @@
                                     <span>{{ user.first_name }} {{ user.last_name }}</span>
                                 </div>
                             </td>
-                            <td>{{ user.email }}</td>
+                            <td class="d-none d-md-table-cell">{{ user.email }}</td>
                             <td>
                                 <span class="badge {% if user.role == 'superuser' %}bg-danger{% elif user.role == 'block_admin' %}bg-warning text-dark{% else %}bg-info text-dark{% endif %}">
                                     {{ user.get_role_display }}

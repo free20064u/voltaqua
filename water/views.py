@@ -19,7 +19,84 @@ from .models import (
     BillOccupancy,
     Payment,
 )
+from dustbin.models import DustbinBill
 from .forms import ApartmentForm, BillEntryForm, PaymentForm
+
+
+def _apply_bill_payment_status(bill, total_paid=None, save=False):
+    """Return the bill's live balance/status and optionally persist status changes."""
+    if total_paid is None:
+        total_paid = bill.payments.aggregate(Sum('amount')).get('amount__sum') or Decimal('0')
+
+    total_paid = Decimal(total_paid)
+    raw_balance = bill.total_bill - total_paid
+    balance = max(raw_balance, Decimal('0'))
+    status = 'paid' if raw_balance <= Decimal('0') else 'pending'
+    previous_status = bill.status
+
+    bill.total_paid = total_paid
+    bill.balance = balance
+    bill.status = status
+
+    if save and previous_status != status:
+        bill.save(update_fields=['status'])
+
+    return balance, status
+
+
+def _settle_bills_with_carryover(bills, save=False):
+    """Apply overpayments as carry-forward credit across a sequence of bills."""
+    credit = Decimal('0')
+    settled_bills = []
+
+    for bill in bills:
+        total_paid = Decimal(getattr(bill, 'total_paid', Decimal('0')) or Decimal('0'))
+        effective_paid = total_paid + credit
+        raw_balance = bill.total_bill - effective_paid
+        balance = max(raw_balance, Decimal('0'))
+        status = 'paid' if raw_balance <= Decimal('0') else 'pending'
+        previous_status = bill.status
+
+        bill.effective_paid = min(effective_paid, bill.total_bill)
+        bill.credit_applied = min(credit, bill.total_bill)
+        bill.total_paid = total_paid
+        bill.balance = balance
+        bill.status = status
+
+        if save and previous_status != status:
+            bill.save(update_fields=['status'])
+
+        credit = max(effective_paid - bill.total_bill, Decimal('0'))
+        bill.carryover_credit = credit
+        settled_bills.append(bill)
+
+    return settled_bills
+
+
+def _get_bills_for_outstanding_calculation(qs_bills):
+    """Return bills with live balances after apartment-level credit carry-forward."""
+    annotated_bills = list(
+        qs_bills.select_related('apartment').annotate(
+            total_paid=Coalesce(Sum('payments__amount'), 0, output_field=models.DecimalField())
+        ).order_by('apartment_id', 'period_end', 'issued_at', 'id')
+    )
+
+    grouped_bills = []
+    current_group = []
+    current_group_key = None
+
+    for bill in annotated_bills:
+        group_key = bill.apartment_id if bill.apartment_id is not None else f"bill-{bill.id}"
+        if group_key != current_group_key and current_group:
+            grouped_bills.extend(_settle_bills_with_carryover(current_group))
+            current_group = []
+        current_group.append(bill)
+        current_group_key = group_key
+
+    if current_group:
+        grouped_bills.extend(_settle_bills_with_carryover(current_group))
+
+    return grouped_bills
 
 
 def _can_view_site(user, site):
@@ -94,16 +171,20 @@ def _gather_stats(site=None, apartment=None):
             total_vol = 0
 
     active_meters = qs_meters.filter(status='active').count()
-    outstanding_bills_qs = qs_bills.filter(status__in=['pending', 'overdue'])
-    outstanding_bills_count = outstanding_bills_qs.count()
-    outstanding_bills_consumption = outstanding_bills_qs.aggregate(Sum('volume_consumed')).get('volume_consumed__sum') or 0
-    
-    total_due = qs_bills.aggregate(Sum('amount_due')).get('amount_due__sum') or Decimal('0')
+    total_due = qs_bills.aggregate(Sum('total_bill')).get('total_bill__sum') or Decimal('0')
     total_paid = qs_payments.aggregate(Sum('amount')).get('amount__sum') or Decimal('0')
     outstanding_bills_amount = total_due - total_paid
     collection_rate = int((total_paid * 100) / total_due) if total_due else 0
+    outstanding_bills_qs = _get_bills_for_outstanding_calculation(qs_bills)
+    outstanding_bills_count = 0
+    outstanding_bills_consumption = Decimal('0')
+    for bill in outstanding_bills_qs:
+        if bill.balance > Decimal('0'):
+            outstanding_bills_count += 1
+            outstanding_bills_consumption += bill.volume_consumed or Decimal('0')
 
     two_places = Decimal('0.01')
+    outstanding_bills_amount = max(outstanding_bills_amount, Decimal('0'))
 
     return {
         'total_consumption_m3': float(round(total_vol, 2)),
@@ -145,6 +226,8 @@ def superuser_dashboard(request):
 
     # recent bills
     recent_bills = Bill.objects.select_related('site', 'apartment', 'apartment__user').order_by('-issued_at')[:10]
+    for bill in recent_bills:
+        _apply_bill_payment_status(bill, save=True)
 
     context = {
         'title': 'Superuser Dashboard — Voltaqua',
@@ -185,6 +268,8 @@ def block_admin_dashboard(request):
 
     # bills for this block
     recent_bills = Bill.objects.filter(site=site).select_related('apartment', 'apartment__user').order_by('-issued_at')[:10]
+    for bill in recent_bills:
+        _apply_bill_payment_status(bill, save=True)
 
     context = {
         'title': f'Block {site.code} Dashboard',
@@ -246,6 +331,8 @@ def block_dashboard(request, site_id):
 
     # bills for this block
     recent_bills = Bill.objects.filter(site=site).select_related('apartment', 'apartment__user').order_by('-issued_at')[:10]
+    for bill in recent_bills:
+        _apply_bill_payment_status(bill, save=True)
 
     context = {
         'title': f'Block {site.code} Dashboard',
@@ -506,16 +593,27 @@ def enter_bill(request, site_id):
         if form.is_valid() and valid_occupancy:
             period_start = form.cleaned_data['period_start']
             period_end = form.cleaned_data['period_end']
-            total_amount = form.cleaned_data['total_amount']
+            water_bill = form.cleaned_data['water_bill']
+            dustbin_bill = form.cleaned_data['dustbin_bill']
             total_volume = form.cleaned_data.get('total_volume')
-            
-            if apartments.exists():
+
+            active_apartments = apartments.filter(is_active=True)
+            num_active_apartments = active_apartments.count()
+
+            if active_apartments.exists():
+                dustbin_bill_per_apartment = (
+                    Decimal(dustbin_bill) / Decimal(num_active_apartments)
+                    if num_active_apartments > 0
+                    else Decimal(0)
+                )
+
                 if total_occupants > 0:
                     created_bills = []
-                    for apartment in apartments:
+                    for apartment in active_apartments:
                         occ = occupancies.get(apartment.id, apartment.occupants)
-                        apartment_share = (Decimal(occ) / Decimal(total_occupants)) * total_amount
+                        apartment_water_share = (Decimal(occ) / Decimal(total_occupants)) * water_bill
                         volume_share = (Decimal(occ) / Decimal(total_occupants)) * total_volume if total_volume else 0
+                        total_bill = apartment_water_share + dustbin_bill_per_apartment
 
                         bill = Bill.objects.create(
                             user=request.user,
@@ -523,33 +621,41 @@ def enter_bill(request, site_id):
                             apartment=apartment,
                             period_start=period_start,
                             period_end=period_end,
-                            amount_due=round(apartment_share, 2),
+                            total_bill=round(total_bill, 2),
+                            water_bill=round(apartment_water_share, 2),
+                            dustbin_bill=round(dustbin_bill_per_apartment, 2),
                             volume_consumed=round(volume_share, 2),
                             status='pending',
                             due_at=timezone.now() + timedelta(days=30),
                         )
-                        # record which occupancy was used
                         BillOccupancy.objects.create(
                             bill=bill,
                             apartment=apartment,
                             occupants=occ,
                         )
-                        # update apartment for future default
                         if apartment.occupants != occ:
                             apartment.occupants = occ
                             apartment.save(update_fields=['occupants'])
 
                         created_bills.append(bill)
+
+                        DustbinBill.objects.create(
+                            bill=bill,
+                            apartment=apartment,
+                            amount=round(dustbin_bill_per_apartment, 2),
+                            period_start=period_start,
+                            period_end=period_end,
+                        )
                     
                     messages.success(
                         request,
-                        f'Bills created successfully! {len(created_bills)} bills distributed to apartments based on occupancy.'
+                        f'Bills created successfully! {len(created_bills)} bills distributed to apartments.'
                     )
                     return redirect('water:block-dashboard', site_id=site.id)
                 else:
                     messages.error(request, 'No occupants recorded for any apartments. Please update apartment occupancy first.')
             else:
-                messages.error(request, 'No apartments found in this block.')
+                messages.error(request, 'No active apartments found in this block.')
     else:
         form = BillEntryForm(site=site)
     
@@ -581,18 +687,15 @@ def record_payment(request, bill_id):
             payment.paid_at = timezone.now()
             payment.save()
 
-            # Check if bill is fully paid and update status
-            total_paid = bill.payments.aggregate(Sum('amount')).get('amount__sum') or 0
-            if total_paid >= bill.amount_due:
-                bill.status = 'paid'
-                bill.save(update_fields=['status'])
+            total_paid = bill.payments.aggregate(Sum('amount')).get('amount__sum') or Decimal('0')
+            _apply_bill_payment_status(bill, total_paid=total_paid, save=True)
             
             messages.success(request, f'Payment of {payment.amount} recorded successfully.')
             return redirect('water:block-dashboard', site_id=bill.site.id)
     else:
         # Default to remaining amount
         total_paid = bill.payments.aggregate(Sum('amount')).get('amount__sum') or 0
-        remaining = max(0, bill.amount_due - total_paid)
+        remaining = max(0, bill.total_bill - total_paid)
         form = PaymentForm(initial={'amount': remaining, 'method': 'cash'})
 
     context = {
@@ -657,16 +760,15 @@ def apartment_bill_list(request, apartment_id):
     # Get all bills for the apartment, with payment sums annotated
     bills_qs = Bill.objects.filter(apartment=apartment).annotate(
         total_paid=Coalesce(Sum('payments__amount'), 0, output_field=models.DecimalField())
-    ).order_by('-period_end')
+    ).order_by('period_end', 'issued_at', 'id')
 
-    # Add balance to each bill object
-    for bill in bills_qs:
-        bill.balance = bill.amount_due - bill.total_paid
+    bills = _settle_bills_with_carryover(list(bills_qs), save=True)
+    bills.reverse()
 
     context = {
         'title': f'Bill History - Apt {apartment.number}',
         'apartment': apartment,
-        'bills': bills_qs,
+        'bills': bills,
     }
     return render(request, 'water/bill_history.html', context)
 

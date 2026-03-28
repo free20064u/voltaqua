@@ -11,7 +11,7 @@
     <ul>
         <li><strong>Bill ID:</strong> #{{ bill.id }}</li>
         <li><strong>Billing Period:</strong> {{ bill.period_start }} to {{ bill.period_end }}</li>
-        <li><strong>Amount Due:</strong> {{ bill.currency }} {{ bill.amount_due }}</li>
+        <li><strong>Amount Due:</strong> {{ bill.currency }} {{ bill.total_bill }}</li>
         <li><strong>Due Date:</strong> {{ bill.due_at|date:"F j, Y" }}</li>
     </ul>
     <p>You can view the full details and manage your bills by logging into your Voltaqua account.</p>

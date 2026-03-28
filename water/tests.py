@@ -52,7 +52,7 @@ class WaterDashboardTests(TestCase):
             site=self.site,
             period_start=today,
             period_end=today,
-            amount_due=200,
+            total_bill=200,
             status='pending',
         )
         # partial payment to test percentage calculation
@@ -86,10 +86,10 @@ class WaterDashboardTests(TestCase):
         # bills attached to apartments
         bill1 = Bill.objects.create(user=self.block_admin, site=block, apartment=apt1,
                                     period_start=timezone.now().date(), period_end=timezone.now().date(),
-                                    amount_due=100, status='pending')
+                                    total_bill=100, status='pending')
         bill2 = Bill.objects.create(user=self.block_admin, site=block, apartment=apt2,
                                     period_start=timezone.now().date(), period_end=timezone.now().date(),
-                                    amount_due=200, status='pending')
+                                    total_bill=200, status='pending')
 
         Payment.objects.create(bill=bill1, amount=100, paid_at=timezone.now())
 
@@ -211,7 +211,7 @@ class WaterDashboardTests(TestCase):
         # there may be pre-existing bills; filter by period to be certain
         bills = bills.filter(period_start=today, period_end=today)
         self.assertEqual(bills.count(), 2)
-        amounts = sorted([float(b.amount_due) for b in bills], reverse=True)
+        amounts = sorted([float(b.total_bill) for b in bills], reverse=True)
         self.assertEqual(amounts, [300.0, 100.0])
         # apartments updated
         apt1.refresh_from_db()
@@ -269,7 +269,7 @@ class WaterDashboardTests(TestCase):
 
         # Check the message content
         bill = Bill.objects.get(apartment=apt)
-        expected_message = f"New Water Bill: {bill.currency} {bill.amount_due} for period {bill.period_start} to {bill.period_end}"
+        expected_message = f"New Water Bill: {bill.currency} {bill.total_bill} for period {bill.period_start} to {bill.period_end}"
         self.assertEqual(notification.message, expected_message)
 
     def test_notification_on_payment_creation(self):
@@ -286,7 +286,7 @@ class WaterDashboardTests(TestCase):
             apartment=apt,
             period_start=timezone.now().date(),
             period_end=timezone.now().date(),
-            amount_due=150,
+            total_bill=150,
             status='pending',
         )
 

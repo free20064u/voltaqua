@@ -4,6 +4,7 @@ from django.db.models import Sum
 from django.utils import timezone
 from django.http import Http404
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.views import redirect_to_login
 from decimal import Decimal, ROUND_HALF_UP
 from django.contrib import messages
 from datetime import timedelta
@@ -202,7 +203,7 @@ def _gather_stats(site=None, apartment=None):
 def home_dashboard(request):
     """Route to role-specific dashboard based on user role."""
     if not request.user.is_authenticated:
-        return render(request, 'accounts/login.html', {'title': 'Log In — Voltaqua'})
+        return redirect_to_login(request.get_full_path(), login_url='accounts:login')
 
     role = getattr(request.user, 'role', 'user')
 

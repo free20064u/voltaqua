@@ -2,7 +2,7 @@ from django.contrib import admin
 from .models import Site, Apartment, Meter, Bill, Payment
 
 class ApartmentAdmin(admin.ModelAdmin):
-    list_display = ('number', 'site', 'occupants', 'is_active')
+    list_display = ('number', 'site', 'user', 'occupants', 'is_active')
     list_filter = ('site', 'is_active')
     search_fields = ('number', 'site__name')
     actions = ['activate_apartments', 'deactivate_apartments']

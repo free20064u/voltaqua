@@ -106,9 +106,10 @@
                 <div class="card apartment-card h-100">
                   <div class="card-body">
                     <h6 class="card-title">Apt {{ item.apartment.number }}</h6>
-                    <p class="text-muted small mb-2">
-                      👥 Occupants: <strong>{{ item.apartment.occupants }}</strong>
-                    </p>
+                    <div class="d-flex justify-content-between text-muted small mb-2">
+                      <span>👤 User: <strong>{% if item.apartment.user %}{{ item.apartment.user.first_name }} {{ item.apartment.user.last_name }}{% else %}N/A{% endif %}</strong></span>
+                      <span>👥 Occupants: <strong>{{ item.apartment.occupants }}</strong></span>
+                    </div>
                     <dl class="row mb-3">
                       <dt class="col-7 text-muted small">Total Consumption:</dt>
                       <dd class="col-5 text-end small"><strong>{{ item.stats.total_consumption_all_time }} m³</strong></dd>
